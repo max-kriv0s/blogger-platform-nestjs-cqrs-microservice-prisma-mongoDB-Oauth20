@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/inctagram-gateway/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": false,
+    "tsConfigPath": "apps/inctagram-gateway/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/",
+  "projects": {
+    "inctagram-backend": {
+      "type": "application",
+      "root": "apps/inctagram-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/inctagram-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/inctagram-gateway/tsconfig.app.json"
+      }
+    },
+    "subscription-app": {
+      "type": "application",
+      "root": "apps/inctagram-subscription",
+      "entryFile": "main",
+      "sourceRoot": "apps/inctagram-subscription/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/inctagram-subscription/tsconfig.app.json"
+      }
+    },
+    "inctagram-upload-files": {
+      "type": "application",
+      "root": "apps/inctagram-upload-files",
+      "entryFile": "main",
+      "sourceRoot": "apps/inctagram-upload-files/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/inctagram-upload-files/tsconfig.app.json"
+      }
+    }
+  }
+}
