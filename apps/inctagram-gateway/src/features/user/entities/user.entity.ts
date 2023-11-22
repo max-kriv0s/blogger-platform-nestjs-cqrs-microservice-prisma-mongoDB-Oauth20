@@ -19,6 +19,9 @@ export class UserEntity implements User {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+  @IsNotEmpty()
+  @IsString()
   hashPassword: string;
   createdAt: Date;
   updatedAt: Date;
@@ -33,7 +36,7 @@ export class UserEntity implements User {
   static create(userDto: CreateUserDto) {
     const _user = new UserEntity(userDto);
 
-    const errors = validateSync(_user, { whitelist: true });
+    const errors = validateSync(_user);
     if (errors.length) {
     }
     return _user;
