@@ -1,6 +1,12 @@
 import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
-import { CreateUserDto } from '@user/dto';
-import { UserFasade } from '@user/user.fasade';
+import { CreateUserDto } from '../../user/dto';
+import { UserFasade } from '../../user/user.fasade';
+
+const baseUrl = '/auth';
+
+export const endpoints = {
+  registration: () => `${baseUrl}/registration`,
+};
 
 @Controller('auth')
 export class AuthController {

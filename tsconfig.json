@@ -19,30 +19,37 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@prisma": [
-        "apps/inctagram-gateway/src/core/prisma"
-      ],
-      "@prisma/*": [
-        "apps/inctagram-gateway/src/core/prisma/*"
-      ],
-      "@core": [
-        "apps/inctagram-gateway/src/core/"
-      ],
-      "@core/*": [
-        "apps/inctagram-gateway/src/core/*"
-      ],
-      "@auth": [
-        "apps/inctagram-gateway/src/features/auth/"
-      ],
-      "@auth/*": [
-        "apps/inctagram-gateway/src/features/auth/*"
-      ],
-      "@user": [
-        "apps/inctagram-gateway/src/features/user/"
-      ],
-      "@user/*": [
-        "apps/inctagram-gateway/src/features/user/*"
-      ],
+      "src/*": ["./src/*"],
+      // "@src": [
+      //   "apps/inctagram-gateway/src/"
+      // ],
+      // "@src/*": [
+      //   "apps/inctagram-gateway/src/*"
+      // ],
+      // "@prisma": [
+      //   "apps/inctagram-gateway/src/core/prisma"
+      // ],
+      // "@prisma/*": [
+      //   "apps/inctagram-gateway/src/core/prisma/*"
+      // ],
+      // "@core": [
+      //   "apps/inctagram-gateway/src/core/"
+      // ],
+      // "@core/*": [
+      //   "apps/inctagram-gateway/src/core/*"
+      // ],
+      // "@auth": [
+      //   "apps/inctagram-gateway/src/features/auth/"
+      // ],
+      // "@auth/*": [
+      //   "apps/inctagram-gateway/src/features/auth/*"
+      // ],
+      // "@user": [
+      //   "apps/inctagram-gateway/src/features/user/"
+      // ],
+      // "@user/*": [
+      //   "apps/inctagram-gateway/src/features/user/*"
+      // ],
     }
   }
 }

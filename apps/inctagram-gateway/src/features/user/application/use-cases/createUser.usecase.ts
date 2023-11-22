@@ -1,13 +1,13 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UserRepository } from '@user/db';
-import { UserRegistrationInfoRepository } from '@user/db/userRegistrationInfo.repository';
-import { CreateUserDto, CreateUserInfoDto } from '@user/dto';
-import { UserService } from '@user/user.service';
 import { v4 as uuidv4 } from 'uuid';
 import add from 'date-fns/add';
-import { UserConfig } from '@user/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserCreatedEvent } from '../events';
+import { UserConfig } from '../../config';
+import { UserRepository } from '../../db';
+import { UserRegistrationInfoRepository } from '../../db/userRegistrationInfo.repository';
+import { CreateUserDto, CreateUserInfoDto } from '../../dto';
+import { UserService } from '../../user.service';
 
 export class CreateUserCommand {
   constructor(public userDto: CreateUserDto) {}
