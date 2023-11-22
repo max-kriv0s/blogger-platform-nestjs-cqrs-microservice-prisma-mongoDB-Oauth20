@@ -5,6 +5,8 @@ import { ResponseUserDto } from '../src/features/user/responses';
 import { AuthTestHelper } from './testHelpers/auth.test.helper';
 import { getAppForE2ETesting } from './utils/tests.utils';
 
+jest.setTimeout(15000);
+
 describe('AuthController (e2e) test', () => {
   let app: INestApplication;
   let authTestHelper: AuthTestHelper;

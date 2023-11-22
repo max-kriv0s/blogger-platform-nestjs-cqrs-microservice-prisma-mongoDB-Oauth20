@@ -1,4 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+  Validate,
+} from 'class-validator';
+import { IsPasswordsMatchingConstraint } from '../decorators';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -14,4 +21,10 @@ export class CreateUserDto {
   @IsString()
   @Length(6, 20)
   password: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(6, 20)
+  @Validate(IsPasswordsMatchingConstraint)
+  passwordConfirmation: string;
 }
