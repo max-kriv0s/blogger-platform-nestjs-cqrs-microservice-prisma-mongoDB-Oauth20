@@ -1,8 +1,8 @@
-import { AuthModule } from '@auth/auth.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from '@prisma/prisma.module';
-import { UserModule } from '@user/user.module';
+import { AuthModule } from './features/auth/auth.module';
+import { PrismaModule } from './core/prisma/prisma.module';
+import { UserModule } from './features/user/user.module';
 
 @Module({
   imports: [
@@ -15,5 +15,3 @@ import { UserModule } from '@user/user.module';
   providers: [],
 })
 export class AppModule {}
-
-console.log('db url:', process.env.DATABASE_URL);
