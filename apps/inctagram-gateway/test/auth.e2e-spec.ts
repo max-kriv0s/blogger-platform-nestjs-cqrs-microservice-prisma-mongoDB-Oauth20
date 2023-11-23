@@ -1,16 +1,16 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { endpoints } from '../src/features/auth/api';
-import { ResponseUserDto } from '../src/features/user/responses';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../src/app.module';
+import { EmailManagerModule } from '../src/core/email-manager/email-manager.module';
+import { EmailAdapter } from '../src/infrastructure';
 import { AuthTestHelper } from './testHelpers/auth.test.helper';
 import {
-  getAppForE2ETesting,
   getErrorMessagesBadRequest,
+  getAppForE2ETesting,
   randomString,
 } from './utils/tests.utils';
-import { Test } from '@nestjs/testing';
-import { EmailManagerModule } from '../src/core/email-manager/email-manager.module';
-import { AppModule } from '../src/app.module';
-import { EmailAdapter } from '../src/infrastructure';
+import { endpoints } from '../src/features/auth/api';
+import { ResponseUserDto } from '../src/features/user/responses';
 import {
   ERROR_FORMAT_EMAIL,
   ERROR_LENGTH_PASSWORD,
