@@ -4,6 +4,10 @@ import { CreateUserDto } from '../src/features/user/dto';
 import { ResponseUserDto } from '../src/features/user/responses';
 import { AuthTestHelper } from './testHelpers/auth.test.helper';
 import { getAppForE2ETesting } from './utils/tests.utils';
+import { Test } from '@nestjs/testing';
+import { EmailManagerModule } from '../src/core/email-manager/email-manager.module';
+import { AppModule } from '../src/app.module';
+import { EmailAdapter } from '../src/infrastructure';
 
 jest.setTimeout(15000);
 
@@ -11,8 +15,19 @@ describe('AuthController (e2e) test', () => {
   let app: INestApplication;
   let authTestHelper: AuthTestHelper;
 
+  const emailAdapterMock = {
+    sendEmail: jest.fn(),
+  };
+
   beforeAll(async () => {
-    app = await getAppForE2ETesting(() => {});
+    const testingModule = await Test.createTestingModule({
+      imports: [EmailManagerModule, AppModule],
+    })
+      .overrideProvider(EmailAdapter)
+      .useValue(emailAdapterMock)
+      .compile();
+
+    app = await getAppForE2ETesting(testingModule);
 
     authTestHelper = new AuthTestHelper(app);
   });
@@ -41,7 +56,12 @@ describe('AuthController (e2e) test', () => {
       };
 
       expect(body).toEqual(expectedBody);
-      return body;
+
+      await new Promise((pause) => setTimeout(pause, 100));
+
+      expect(emailAdapterMock.sendEmail).toHaveBeenCalled();
+      expect(emailAdapterMock.sendEmail).toBeCalledTimes(1);
+      expect(emailAdapterMock.sendEmail.mock.calls[0][0]).toBe(userDto.email);
     });
   });
 });
