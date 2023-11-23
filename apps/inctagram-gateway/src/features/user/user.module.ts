@@ -7,6 +7,7 @@ import { UserService } from './user.service';
 import { UserRegistrationInfoRepository } from './db/userRegistrationInfo.repository';
 import { UserConfig } from './config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { IsPasswordsMatchingConstraint } from './decorators';
 
 @Module({
   imports: [CqrsModule, EventEmitterModule.forRoot()],
@@ -18,6 +19,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     UserRegistrationInfoRepository,
     UserService,
     UserFasade,
+    IsPasswordsMatchingConstraint,
   ],
   exports: [UserFasade],
 })

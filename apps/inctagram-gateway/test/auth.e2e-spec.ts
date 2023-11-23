@@ -25,8 +25,9 @@ describe('AuthController (e2e) test', () => {
     it(`${endpoints.registration()} (POST) - registration the user with correct data'`, async () => {
       const userDto: CreateUserDto = {
         username: 'new-test-user',
-        password: 'new-test-user',
         email: 'test@test.com',
+        password: 'new-test-user',
+        passwordConfirm: 'new-test-user',
       };
 
       const { body } = await authTestHelper.registrationUser(userDto);

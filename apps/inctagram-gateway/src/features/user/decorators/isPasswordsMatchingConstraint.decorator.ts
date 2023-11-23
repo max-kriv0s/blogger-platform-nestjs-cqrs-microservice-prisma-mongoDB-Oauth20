@@ -4,7 +4,9 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { CreateUserDto } from '../dto';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 @ValidatorConstraint({ name: 'IsPasswordsMathing', async: false })
 export class IsPasswordsMatchingConstraint
   implements ValidatorConstraintInterface
@@ -14,6 +16,6 @@ export class IsPasswordsMatchingConstraint
     return obj.password === passwordRepeat;
   }
   defaultMessage?(validationArguments?: ValidationArguments): string {
-    throw 'Passwords must match';
+    return 'Passwords must match';
   }
 }
