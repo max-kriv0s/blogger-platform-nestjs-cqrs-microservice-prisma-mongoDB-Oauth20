@@ -56,7 +56,7 @@ describe('AuthController (e2e) test', () => {
       const expectedBody: ResponseUserDto = {
         id: expect.any(String),
         username: userDto.username,
-        email: userDto.email,ERROR_LENGTH_USERNAME
+        email: userDto.email,
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
       };
