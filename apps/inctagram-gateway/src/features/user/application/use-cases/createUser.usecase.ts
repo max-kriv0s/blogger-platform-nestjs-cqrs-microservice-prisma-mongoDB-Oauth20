@@ -8,6 +8,13 @@ import { UserRepository } from '../../db';
 import { UserRegistrationInfoRepository } from '../../db/userRegistrationInfo.repository';
 import { CreateUserDto, CreateUserInfoDto } from '../../dto';
 import { UserService } from '../../user.service';
+import { validateOrRejectModel } from '../../../../core/config';
+import { Result } from '../../../../core/result';
+import { BadRequestError } from '../../../../core/exceptions';
+import {
+  ERROR_EMAIL_IS_ALREADY_REGISTRED,
+  ERROR_USERNAME_IS_ALREADY_REGISTRED,
+} from '../../user.constants';
 
 export class CreateUserCommand {
   constructor(public userDto: CreateUserDto) {}
@@ -24,6 +31,26 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
   ) {}
 
   async execute({ userDto }: CreateUserCommand): Promise<any> {
+    await validateOrRejectModel(userDto, CreateUserDto);
+
+    const userByEmail = await this.userRepo.findByUsernameOrEmail(
+      userDto.email,
+    );
+    if (userByEmail) {
+      return Result.Err(
+        new BadRequestError(ERROR_EMAIL_IS_ALREADY_REGISTRED, 'email'),
+      );
+    }
+
+    const userByLogin = await this.userRepo.findByUsernameOrEmail(
+      userDto.username,
+    );
+    if (userByLogin) {
+      return Result.Err(
+        new BadRequestError(ERROR_USERNAME_IS_ALREADY_REGISTRED, 'username'),
+      );
+    }
+
     userDto.password = this.userService.generatePasswordHash(userDto.password);
     const createdUser = await this.userRepo.create(userDto);
 
@@ -42,6 +69,6 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
       new UserCreatedEvent(createdUser.email, userInfo.confirmationCode),
     );
 
-    return createdUser;
+    return Result.Ok(createdUser);
   }
 }

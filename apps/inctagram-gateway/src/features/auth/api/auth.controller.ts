@@ -1,4 +1,4 @@
-import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { CreateUserDto } from '../../user/dto';
 import { UserFasade } from '../../user/user.fasade';
 
@@ -15,12 +15,17 @@ export class AuthController {
   @Post('registration')
   async createUser(@Body() userDto: CreateUserDto) {
     const resultCreated = await this.userFasade.useCases.createUser(userDto);
-    const userView = await this.userFasade.queries.getUserViewById(
-      resultCreated.id,
-    );
-    if (!userView) {
-      throw new NotFoundException();
+
+    if (!resultCreated.isSuccess) {
+      return resultCreated.err;
     }
-    return userView;
+
+    const resultView = await this.userFasade.queries.getUserViewById(
+      resultCreated.value.id,
+    );
+    if (!resultView.isSuccess) {
+      return resultCreated.err;
+    }
+    return resultView.value;
   }
 }
