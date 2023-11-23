@@ -1,5 +1,5 @@
 import { configApp } from '../../src/core/config';
-import { INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import { PrismaService } from '../../src/core/prisma/prisma.servise';
 import { TestingModule } from '@nestjs/testing';
 
@@ -31,4 +31,23 @@ async function truncateDBTables(app: INestApplication) {
   } catch (error) {
     console.log({ error });
   }
+}
+
+export function randomString(n: number) {
+  let rnd = '';
+  while (rnd.length < n) rnd += Math.random().toString(36).substring(2);
+  return rnd.substring(0, n);
+}
+
+export function getErrorMessagesBadRequest() {
+  return {
+    message: [
+      {
+        field: '',
+        message: expect.any(String),
+      },
+    ],
+    error: expect.any(String),
+    statusCode: HttpStatus.BAD_REQUEST,
+  };
 }
