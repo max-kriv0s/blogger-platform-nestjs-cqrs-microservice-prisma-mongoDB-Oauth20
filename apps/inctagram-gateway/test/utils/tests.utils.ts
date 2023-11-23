@@ -1,22 +1,10 @@
-import { TestingModuleBuilder, Test } from '@nestjs/testing';
-import { AppModule } from '../../src/app.module';
 import { configApp } from '../../src/core/config';
 import { INestApplication } from '@nestjs/common';
 import { PrismaService } from '../../src/core/prisma/prisma.servise';
+import { TestingModule } from '@nestjs/testing';
 
-export const getAppForE2ETesting = async (
-  setupModuleBuilder: (appModuleBuilder: TestingModuleBuilder) => void,
-) => {
-  const appModuleBuilder: TestingModuleBuilder = Test.createTestingModule({
-    imports: [AppModule],
-    providers: [PrismaService],
-  });
-
-  setupModuleBuilder(appModuleBuilder);
-
-  const appModule = await appModuleBuilder.compile();
-
-  const app = appModule.createNestApplication();
+export const getAppForE2ETesting = async (testingModule: TestingModule) => {
+  const app = testingModule.createNestApplication();
   configApp(app);
   await app.init();
 
