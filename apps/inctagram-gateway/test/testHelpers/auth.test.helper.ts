@@ -6,6 +6,15 @@ import { CreateUserDto } from '../../src/features/user/dto';
 export class AuthTestHelper {
   constructor(private app: INestApplication) {}
 
+  userDto(): CreateUserDto {
+    return {
+      username: 'new-test-user',
+      email: 'test@test.com',
+      password: 'newTestUser1!',
+      passwordConfirm: 'newTestUser1!',
+    };
+  }
+
   async registrationUser(
     userDto: CreateUserDto,
     config: {
