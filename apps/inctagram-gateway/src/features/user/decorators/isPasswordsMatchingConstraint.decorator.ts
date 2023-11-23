@@ -16,7 +16,7 @@ export class IsPasswordsMatchingConstraint
     const obj = args.object as CreateUserDto;
     return obj.password === passwordRepeat;
   }
-  defaultMessage?(validationArguments?: ValidationArguments): string {
+  defaultMessage?(): string {
     return ERROR_PASSWORDS_MUST_MATCH;
   }
 }
