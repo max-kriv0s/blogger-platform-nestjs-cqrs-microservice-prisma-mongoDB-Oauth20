@@ -1,10 +1,12 @@
 import { ExceptionCodes } from './exceptionCodes';
 
-export class CustomError {
+export class CustomError extends Error {
   constructor(
     protected readonly _message: string,
     protected readonly _code?: number,
-  ) {}
+  ) {
+    super(_message);
+  }
 
   get code(): number {
     return this._code;
