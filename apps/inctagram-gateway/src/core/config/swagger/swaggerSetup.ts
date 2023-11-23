@@ -9,5 +9,5 @@ export function swaggerSetup(app: INestApplication) {
     .addTag('Intagram')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('doc', app, document);
+  SwaggerModule.setup('api/doc', app, document);
 }
