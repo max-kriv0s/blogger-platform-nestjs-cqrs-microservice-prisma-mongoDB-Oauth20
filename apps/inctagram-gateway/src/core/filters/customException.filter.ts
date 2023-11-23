@@ -1,6 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { CustomError } from '../exceptions/customException';
+import { BadRequestError, CustomError } from '../exceptions/customException';
 
 @Catch(CustomError)
 export class CustomExceptionFilter implements ExceptionFilter {
@@ -8,6 +8,14 @@ export class CustomExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
+
+    if (exception instanceof BadRequestError) {
+      return response.status(exception.code).json({
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        message: exception.getError,
+      });
+    }
 
     response.status(exception.code).json({
       timestamp: new Date().toISOString(),
