@@ -15,6 +15,28 @@ export class CustomError {
   }
 }
 
+export class BadRequestError extends CustomError {
+  private readonly _field: string;
+
+  constructor(msg: string, field: string) {
+    super(msg, ExceptionCodes.BadRequest);
+    this._field = field;
+  }
+
+  get getError() {
+    return this.getViewError();
+  }
+
+  private getViewError() {
+    return [
+      {
+        message: this._message,
+        field: this._field,
+      },
+    ];
+  }
+}
+
 export class UnauthorizedError extends CustomError {
   constructor(msg: string) {
     super(msg, ExceptionCodes.Unauthorized);
