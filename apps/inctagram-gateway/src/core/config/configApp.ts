@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import { pipesSetup } from './pipes/pipesSetup';
 import { AppModule } from '../../app.module';
 import { useContainer } from 'class-validator';
+import { filterSetup } from './filters';
 
 export function configApp(app: INestApplication) {
   app.setGlobalPrefix('api');
@@ -12,5 +13,6 @@ export function configApp(app: INestApplication) {
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   pipesSetup(app);
+  filterSetup(app);
   swaggerSetup(app);
 }
