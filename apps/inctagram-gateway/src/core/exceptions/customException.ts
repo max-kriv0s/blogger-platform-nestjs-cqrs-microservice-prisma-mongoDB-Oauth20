@@ -15,12 +15,6 @@ export class CustomError {
   }
 }
 
-export class BadRequestError extends CustomError {
-  constructor(msg: string) {
-    super(msg, ExceptionCodes.BadRequest);
-  }
-}
-
 export class UnauthorizedError extends CustomError {
   constructor(msg: string) {
     super(msg, ExceptionCodes.Unauthorized);
