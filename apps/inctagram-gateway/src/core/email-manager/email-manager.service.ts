@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { AppConfig } from '../config/application';
 import { EmailAdapter } from '../../infrastructure';
-import { UserCreatedEvent } from '../../features/user/application/events';
+import {
+  USER_CREATED_EVENT_NAME,
+  UserInfoCreatedEvent,
+  UserInfoUpdatedEvent,
+} from '../../features/user/application/events';
 import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
@@ -14,11 +18,11 @@ export class EmailManagerService {
     this.APP_URL = appConfig.getFrontendEmailConfirmationUrl();
   }
 
-  @OnEvent('user.created')
-  async sendEmailConfirmationMessage(payload: UserCreatedEvent) {
+  @OnEvent(USER_CREATED_EVENT_NAME)
+  async sendEmailConfirmationMessage(payload: UserInfoCreatedEvent) {
     const textMessage = `<h1>Thank for your registration</h1>
           <p>To finish registration please follow the link below:
-              <a href='${this.APP_URL}/confirm-email?code=${payload.configmationCode}'>complete registration</a>
+              <a href='${this.APP_URL}?code=${payload.configmationCode}'>complete registration</a>
           </p>`;
 
     await this.emailAdapter.sendEmail(
@@ -28,14 +32,15 @@ export class EmailManagerService {
     );
   }
 
-  async sendPasswordRecoveryMessage(email: string, confirmationCode: string) {
+  @OnEvent('confirmationCode.updated')
+  async sendPasswordRecoveryMessage(payload: UserInfoUpdatedEvent) {
     const textMessage = `<h1>Resending email confirmation</h1>
           <p>To finish registration please follow the link below:
-              <a href='${this.APP_URL}/confirm-email?code=${confirmationCode}'>complete registration</a>
+              <a href='${this.APP_URL}?code=${payload.configmationCode}'>complete registration</a>
           </p>`;
 
     await this.emailAdapter.sendEmail(
-      email,
+      payload.email,
       'Resending email confirmation',
       textMessage,
     );
