@@ -1,11 +1,13 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { CreateUserDto } from '../../user/dto';
 import { UserFasade } from '../../user/user.fasade';
+import { ConfirmationCodeDto } from '../dto';
 
 const baseUrl = '/auth';
 
 export const endpoints = {
   registration: () => `${baseUrl}/registration`,
+  registrationConfirmation: () => `${baseUrl}/registration-confirmation`,
 };
 
 @Controller('auth')
@@ -27,5 +29,15 @@ export class AuthController {
       return resultCreated.err;
     }
     return resultView.value;
+  }
+
+  @Post('registration-confirmation')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async confirmRegistration(@Body() confirmDto: ConfirmationCodeDto) {
+    const resultConfirmed =
+      await this.userFasade.useCases.confirmationRegistration(confirmDto);
+    if (!resultConfirmed.isSuccess) {
+      return resultConfirmed.err;
+    }
   }
 }
