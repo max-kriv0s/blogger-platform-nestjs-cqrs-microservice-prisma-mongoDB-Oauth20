@@ -24,7 +24,7 @@ export class Result<T> {
   }
 
   get err(): CustomError {
-    throw this._error;
+    return this._error;
   }
 
   get isSuccess(): boolean {
