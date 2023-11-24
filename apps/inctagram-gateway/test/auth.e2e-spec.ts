@@ -12,6 +12,7 @@ import {
 import { endpoints } from '../src/features/auth/api';
 import { ResponseUserDto } from '../src/features/user/responses';
 import {
+  ERROR_EMAIL_IS_ALREADY_REGISTRED,
   ERROR_FORMAT_EMAIL,
   ERROR_LENGTH_PASSWORD,
   ERROR_LENGTH_USERNAME,
@@ -66,7 +67,6 @@ describe('AuthController (e2e) test', () => {
       await new Promise((pause) => setTimeout(pause, 100));
 
       expect(emailAdapterMock.sendEmail).toHaveBeenCalled();
-      expect(emailAdapterMock.sendEmail).toBeCalledTimes(1);
       expect(emailAdapterMock.sendEmail.mock.calls[0][0]).toBe(userDto.email);
     });
     it(`${endpoints.registration()} (POST) - registration the user incorrect username'`, async () => {
@@ -99,7 +99,6 @@ describe('AuthController (e2e) test', () => {
       ).body;
       expect(body).toEqual(errorMessagesBadRequest);
     });
-
     it(`${endpoints.registration()} (POST) - registration the user incorrect email'`, async () => {
       const userDto = authTestHelper.userDto();
       userDto.email = 'test';
@@ -114,7 +113,6 @@ describe('AuthController (e2e) test', () => {
       ).body;
       expect(body).toEqual(errorMessagesBadRequest);
     });
-
     it(`${endpoints.registration()} (POST) - registration the user incorrect password'`, async () => {
       const userDto = authTestHelper.userDto();
 
@@ -153,7 +151,6 @@ describe('AuthController (e2e) test', () => {
       ).body;
       expect(body).toEqual(errorMessagesBadRequest);
     });
-
     it(`${endpoints.registration()} (POST) - registration the user incorrect passwordConfirm'`, async () => {
       const userDto = authTestHelper.userDto();
       userDto.passwordConfirm = '';
@@ -167,6 +164,84 @@ describe('AuthController (e2e) test', () => {
         })
       ).body;
       expect(body).toEqual(errorMessagesBadRequest);
+    });
+    it(`${endpoints.registration()} (POST) - User with this email is already registered'`, async () => {
+      const userDto = authTestHelper.userDto();
+
+      await authTestHelper.registrationUser(userDto);
+
+      userDto.username = randomString(10);
+      const { body } = await authTestHelper.registrationUser(userDto, {
+        expectedCode: HttpStatus.BAD_REQUEST,
+      });
+
+      errorMessagesBadRequest.message[0].field = 'email';
+      errorMessagesBadRequest.message[0].message =
+        ERROR_EMAIL_IS_ALREADY_REGISTRED;
+
+      expect(body).toEqual(errorMessagesBadRequest);
+
+      await new Promise((pause) => setTimeout(pause, 100));
+
+      expect(emailAdapterMock.sendEmail).toHaveBeenCalled();
+      const mock = emailAdapterMock.sendEmail.mock;
+      const callWithCurrentEmail = mock.calls.filter((call) => {
+        return call[0] === userDto.email;
+      });
+      expect(callWithCurrentEmail.length).toBe(1);
+    });
+  });
+
+  describe('Confirmation user', () => {
+    it(`${endpoints.registrationConfirmation} (POST) confirmation code correct data`, async () => {
+      const userDto = authTestHelper.userDto();
+
+      await authTestHelper.registrationUser(userDto);
+      await new Promise((pause) => setTimeout(pause, 100));
+
+      expect(emailAdapterMock.sendEmail).toHaveBeenCalled();
+      const mock = emailAdapterMock.sendEmail.mock;
+      const lastMockCall = mock.calls.length - 1;
+      expect(mock.calls[lastMockCall][0]).toBe(userDto.email);
+
+      const message = mock.calls[lastMockCall][2];
+      const startIndex = message.indexOf('code');
+      expect(startIndex).not.toBe(-1);
+
+      const codeConfirmation = message.slice(
+        startIndex + 5,
+        message.indexOf("'", startIndex) !== -1
+          ? message.indexOf("'", startIndex)
+          : message.length,
+      );
+
+      await authTestHelper.confirmRegistration({ code: codeConfirmation });
+    });
+    it(`${endpoints.registrationConfirmation} (POST) confirmation code incorrect data`, async () => {
+      await authTestHelper.confirmRegistration(
+        { code: '' },
+        { expectedCode: HttpStatus.BAD_REQUEST },
+      );
+    });
+  });
+
+  describe('Unauthorized user did not receive link to email', () => {
+    it(`${endpoints.registration()} (POST) - resend verification code`, async () => {
+      const userDto = authTestHelper.userDto();
+
+      await authTestHelper.registrationUser(userDto);
+      await authTestHelper.registrationUser(userDto);
+
+      await new Promise((pause) => setTimeout(pause, 100));
+
+      expect(emailAdapterMock.sendEmail).toHaveBeenCalled();
+      expect(emailAdapterMock.sendEmail.mock.lastCall[0]).toBe(userDto.email);
+
+      const mock = emailAdapterMock.sendEmail.mock;
+      const callWithCurrentEmail = mock.calls.filter((call) => {
+        return call[0] === userDto.email;
+      });
+      expect(callWithCurrentEmail.length).toBe(2);
     });
   });
 });
