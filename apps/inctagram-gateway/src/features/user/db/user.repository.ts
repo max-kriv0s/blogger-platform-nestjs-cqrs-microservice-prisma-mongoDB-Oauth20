@@ -17,10 +17,17 @@ export class UserRepository {
     });
   }
 
-  async findByUsernameOrEmail(usernameOrEmail: string): Promise<User | null> {
+  async findByUsernameOrEmail(usernameOrEmail: string) {
     return this.prismaService.user.findFirst({
       where: {
         OR: [{ name: usernameOrEmail }, { email: usernameOrEmail }],
+      },
+      select: {
+        id: true,
+        name: true,
+        hashPassword: true,
+        email: true,
+        userRegistrationInfo: { select: { isConfirmed: true, id: true } },
       },
     });
   }
