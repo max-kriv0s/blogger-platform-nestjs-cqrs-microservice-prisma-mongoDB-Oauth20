@@ -5,14 +5,20 @@ import { ConfigService } from '@nestjs/config';
 export class AppConfig {
   constructor(protected configService: ConfigService) {}
 
-  getAppUrl() {
+  getAppUrl(): string {
     return (
       this.configService.get<string>('APP_URL') ??
       `http://127.0.0.1:${this.getPort()}`
     );
   }
 
-  getPort() {
+  getPort(): number {
     return this.configService.get<number>('PORT', 3000);
+  }
+
+  getFrontendEmailConfirmationUrl(): string {
+    return (
+      this.configService.get<string>('FRONTEND_EMAIL_CONFIRMATION_URL') ?? ''
+    );
   }
 }
