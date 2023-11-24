@@ -2,6 +2,11 @@ import { configApp } from '../../src/core/config';
 import { INestApplication } from '@nestjs/common';
 import { PrismaService } from '../../src/core/prisma/prisma.servise';
 import { TestingModule } from '@nestjs/testing';
+import { v4 as uuidv4 } from 'uuid';
+
+export function getGlobalPrefix() {
+  return '/api';
+}
 
 export const getAppForE2ETesting = async (testingModule: TestingModule) => {
   const app = testingModule.createNestApplication();
@@ -37,6 +42,10 @@ export function randomString(n: number) {
   let rnd = '';
   while (rnd.length < n) rnd += Math.random().toString(36).substring(2);
   return rnd.substring(0, n);
+}
+
+export function randomUUID() {
+  return uuidv4();
 }
 
 export function getErrorMessagesBadRequest() {
