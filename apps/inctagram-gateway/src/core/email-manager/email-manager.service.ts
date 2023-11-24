@@ -11,7 +11,7 @@ export class EmailManagerService {
     private readonly appConfig: AppConfig,
     private readonly emailAdapter: EmailAdapter,
   ) {
-    this.APP_URL = appConfig.getAppUrl();
+    this.APP_URL = appConfig.getFrontendEmailConfirmationUrl();
   }
 
   @OnEvent('user.created')
