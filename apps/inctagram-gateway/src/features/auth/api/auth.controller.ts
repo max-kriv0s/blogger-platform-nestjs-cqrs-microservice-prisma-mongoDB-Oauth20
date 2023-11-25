@@ -1,5 +1,9 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { CreateUserDto, UserPasswordRecoveryDto } from '../../user/dto';
+import {
+  CreateUserDto,
+  NewPasswordDto,
+  UserPasswordRecoveryDto,
+} from '../../user/dto';
 import { UserFasade } from '../../user/user.fasade';
 import { ConfirmationCodeDto, ConfirmationRecoveryCodeDto } from '../dto';
 import {
@@ -89,6 +93,20 @@ export class AuthController {
 
     if (!confirmationResult.isSuccess) {
       throw confirmationResult.err;
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Changing the user password',
+  })
+  @ApiNoContentResponse()
+  @ApiBadRequestResponse({ type: BadRequestResponse })
+  @Post('new-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async newPassword(dto: NewPasswordDto) {
+    const updateResult = await this.userFasade.useCases.newPassword(dto);
+    if (!updateResult.isSuccess) {
+      return updateResult.err;
     }
   }
 }
