@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreateUserDto, UserPasswordRecoveryDto } from './dto';
+import { CreateUserDto, NewPasswordDto, UserPasswordRecoveryDto } from './dto';
 import { UserQueryRepository } from './db/user.query.repository';
 import { ResponseUserDto } from './responses';
 import { User } from '@prisma/client';
@@ -9,6 +9,7 @@ import {
   ConfirmationRecoveryCodeCommand,
   ConfirmationRegistrationCommand,
   CreateUserCommand,
+  NewPasswordCommand,
 } from './application';
 import { ConfirmationCodeDto, ConfirmationRecoveryCodeDto } from '../auth/dto';
 import { UserPasswordRecoveryCommand } from './application/use-cases/userPasswordRecovery.usecase';
@@ -27,6 +28,7 @@ export class UserFasade {
       this.passwordRecovery(passwordRRecoveryDto),
     confirmationPasswordRecovery: (recoveryDto: ConfirmationRecoveryCodeDto) =>
       this.confirmationPasswordRecovery(recoveryDto),
+    newPassword: (dto: NewPasswordDto) => this.newPassword(dto),
   };
   queries = { getUserViewById: (id: string) => this.getUserViewById(id) };
 
@@ -58,6 +60,12 @@ export class UserFasade {
   ): Promise<Result> {
     return this.commandBus.execute<ConfirmationRecoveryCodeCommand, Result>(
       new ConfirmationRecoveryCodeCommand(recoveryDto),
+    );
+  }
+
+  private async newPassword(dto: NewPasswordDto): Promise<Result> {
+    return this.commandBus.execute<NewPasswordCommand, Result>(
+      new NewPasswordCommand(dto),
     );
   }
 

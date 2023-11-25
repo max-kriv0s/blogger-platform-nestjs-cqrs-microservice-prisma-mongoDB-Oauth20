@@ -17,6 +17,10 @@ export class UserRepository {
     });
   }
 
+  async update(id: string, data: Partial<Omit<User, 'id'>>) {
+    return this.prismaService.user.update({ where: { id }, data });
+  }
+
   async findByUsernameOrEmail(usernameOrEmail: string) {
     return this.prismaService.user.findFirst({
       where: {
