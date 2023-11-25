@@ -1,6 +1,6 @@
 import { CustomError } from './exceptions/customException';
 
-export class Result<T> {
+export class Result<T = null> {
   constructor(
     private readonly _isSuccess: boolean,
     private readonly _value?: T,
