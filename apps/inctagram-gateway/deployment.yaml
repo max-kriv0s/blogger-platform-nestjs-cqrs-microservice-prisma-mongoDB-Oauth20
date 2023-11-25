@@ -27,6 +27,11 @@ spec:
                  secretKeyRef:
                    name: inctagram-backend-production-config-secret
                    key: DIRECT_URL
+             - name: PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-backend-production-config-secret
+                   key: PORT
              - name: DATABASE_URL
                valueFrom:
                  secretKeyRef:
