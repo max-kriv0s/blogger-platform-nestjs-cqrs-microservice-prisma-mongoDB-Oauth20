@@ -38,6 +38,7 @@ export class CreateUserDto {
     example: 'test@gmail.com',
   })
   @IsNotEmpty()
+  @IsString()
   @IsEmail(
     {},
     {
