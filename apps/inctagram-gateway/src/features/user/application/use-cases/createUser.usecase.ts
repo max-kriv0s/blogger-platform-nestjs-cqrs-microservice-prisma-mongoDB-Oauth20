@@ -12,12 +12,6 @@ import {
 } from '../../user.constants';
 import { FoundUserByEmailOrUsername } from '../../types';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import {
-  USER_CREATED_EVENT_NAME as USER_CREATED_EVENT_NAME,
-  USER_UPDATED_EVENT_NAME,
-  UserInfoCreatedEvent,
-  UserInfoUpdatedEvent,
-} from '../events';
 
 export class CreateUserCommand {
   constructor(public userDto: CreateUserDto) {}
@@ -41,7 +35,7 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     );
 
     if (this.isCorrectNotConfirmedUser(userByEmail, userDto)) {
-      await this.updateConfirmationCode(
+      await this.userService.updateConfirmationCode(
         userByEmail.userRegistrationInfo.id,
         userByEmail.email,
       );
@@ -59,7 +53,7 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     );
 
     if (this.isCorrectNotConfirmedUser(userByLogin, userDto)) {
-      await this.updateConfirmationCode(
+      await this.userService.updateConfirmationCode(
         userByEmail.userRegistrationInfo.id,
         userByEmail.email,
       );
@@ -76,7 +70,7 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     const createdUser = await this.userRepo.create(userDto);
 
     const userInfo = await this.createUserInfo(createdUser.id);
-    this.createUserInfoCreatedEvent(
+    this.userService.createUserInfoCreatedEvent(
       createdUser.email,
       userInfo.confirmationCode,
     );
@@ -105,33 +99,6 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
       user.email === userDto.email &&
       this.userService.isCorrectPassword(userDto.password, user.hashPassword) &&
       !user.userRegistrationInfo.isConfirmed
-    );
-  }
-
-  async updateConfirmationCode(userInfoId: string, email: string) {
-    const confirmationCode = this.userService.generateConfirmationCode();
-    const updatedUserInfo = await this.userRegistrationInfoRepo.update(
-      userInfoId,
-      {
-        confirmationCode: confirmationCode.code,
-        expirationConfirmationCode: confirmationCode.expiration,
-      },
-    );
-    this.createUserInfoUpdatedEvent(email, confirmationCode.code);
-    return updatedUserInfo;
-  }
-
-  createUserInfoCreatedEvent(email: string, confirmationCode: string) {
-    this.eventEmitter.emit(
-      USER_CREATED_EVENT_NAME,
-      new UserInfoCreatedEvent(email, confirmationCode),
-    );
-  }
-
-  createUserInfoUpdatedEvent(email: string, confirmationCode: string) {
-    this.eventEmitter.emit(
-      USER_UPDATED_EVENT_NAME,
-      new UserInfoUpdatedEvent(email, confirmationCode),
     );
   }
 }
