@@ -5,4 +5,7 @@ export class UserConfig {
   getConfirmationCodeLifetime() {
     return { hours: 1 };
   }
+  getRecoveryCodeLifetime() {
+    return { hours: 1 };
+  }
 }
