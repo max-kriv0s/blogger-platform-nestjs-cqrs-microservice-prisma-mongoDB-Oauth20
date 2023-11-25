@@ -22,10 +22,9 @@ export class ConfirmationRegistrationUseCase
   }: ConfirmationRegistrationCommand): Promise<Result<boolean>> {
     await validateOrRejectModel(confirmDto, ConfirmationCodeDto);
 
-    const userInfo =
-      await this.userRegistrationInfoRepo.findUserByCodeConfirmation(
-        confirmDto.code,
-      );
+    const userInfo = await this.userRegistrationInfoRepo.findByCodeConfirmation(
+      confirmDto.code,
+    );
     if (
       !userInfo ||
       userInfo.isConfirmed ||

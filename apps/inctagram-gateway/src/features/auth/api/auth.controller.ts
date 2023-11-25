@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { CreateUserDto } from '../../user/dto';
+import { CreateUserDto, UserPasswordRecoveryDto } from '../../user/dto';
 import { UserFasade } from '../../user/user.fasade';
-import { ConfirmationCodeDto } from '../dto';
+import { ConfirmationCodeDto, ConfirmationRecoveryCodeDto } from '../dto';
 import {
   ApiBadRequestResponse,
   ApiNoContentResponse,
@@ -53,10 +53,42 @@ export class AuthController {
   @Post('registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
   async confirmRegistration(@Body() confirmDto: ConfirmationCodeDto) {
-    const resultConfirmed =
+    const confirmationResult =
       await this.userFasade.useCases.confirmationRegistration(confirmDto);
-    if (!resultConfirmed.isSuccess) {
-      throw resultConfirmed.err;
+    if (!confirmationResult.isSuccess) {
+      throw confirmationResult.err;
+    }
+  }
+
+  @ApiOperation({
+    summary: 'User password recovery',
+  })
+  @ApiNoContentResponse()
+  @ApiBadRequestResponse({ type: BadRequestResponse })
+  @Post('password-recovery')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async passwordRecovery(passwordRRecoveryDto: UserPasswordRecoveryDto) {
+    const recoveryResult = await this.userFasade.useCases.passwordRecovery(
+      passwordRRecoveryDto,
+    );
+    if (!recoveryResult.isSuccess) {
+      throw recoveryResult.err;
+    }
+  }
+
+  @ApiOperation({
+    summary: 'User recovery code confirmation',
+  })
+  @ApiNoContentResponse()
+  @ApiBadRequestResponse({ type: BadRequestResponse })
+  @Post('password-recovery-confirmation')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async passwordRecoveryConfirmation(recoveryDto: ConfirmationRecoveryCodeDto) {
+    const confirmationResult =
+      await this.userFasade.useCases.confirmationPasswordRecovery(recoveryDto);
+
+    if (!confirmationResult.isSuccess) {
+      throw confirmationResult.err;
     }
   }
 }

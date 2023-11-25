@@ -34,7 +34,7 @@ export class UserPasswordRecoveryUseCase
 
   async execute({
     passwordRecoveryDto,
-  }: UserPasswordRecoveryCommand): Promise<Result<boolean>> {
+  }: UserPasswordRecoveryCommand): Promise<Result> {
     await validateOrRejectModel(passwordRecoveryDto, UserPasswordRecoveryDto);
 
     const user = await this.userRepo.findByUsernameOrEmail(
@@ -52,7 +52,7 @@ export class UserPasswordRecoveryUseCase
         user.userRegistrationInfo.id,
         user.email,
       );
-      return Result.Ok(true);
+      return Result.Ok();
     }
   }
 
