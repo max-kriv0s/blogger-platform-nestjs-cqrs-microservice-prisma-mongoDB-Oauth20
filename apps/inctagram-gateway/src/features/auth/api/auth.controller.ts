@@ -1,4 +1,13 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Ip,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { CreateUserDto } from '../../user/dto';
 import { UserFasade } from '../../user/user.fasade';
 import { ConfirmationCodeDto } from '../dto';
@@ -18,6 +27,7 @@ export const endpoints = {
   registration: () => `${baseUrl}/registration`,
   registrationConfirmation: () => `${baseUrl}/registration-confirmation`,
 };
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -59,4 +69,12 @@ export class AuthController {
       throw resultConfirmed.err;
     }
   }
+
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(
+    @Ip() ip: string,
+    @Headers('user-agent') deviceTitle: string,
+    @Res({ passthrough: true }) response: Response,
+  ) {}
 }
