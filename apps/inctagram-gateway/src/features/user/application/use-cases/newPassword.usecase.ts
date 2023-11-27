@@ -26,15 +26,13 @@ export class NewPasswordUseCase implements ICommandHandler<NewPasswordCommand> {
       dto.recoveryCode,
     );
 
-    if (!userInfo) {
+    if (!userInfo || userInfo.expirationRecoveryCode < new Date()) {
       return Result.Err(
-        new BadRequestError(ERROR_INCORRECT_RECOVER_CODE, dto.recoveryCode),
+        new BadRequestError(ERROR_INCORRECT_RECOVER_CODE, 'recoveryCode'),
       );
     }
 
-    const newHashPassword = this.userService.generatePasswordHash(
-      dto.newPassword,
-    );
+    const newHashPassword = this.userService.generatePasswordHash(dto.password);
     await this.userRepo.update(userInfo.userId, {
       hashPassword: newHashPassword,
     });

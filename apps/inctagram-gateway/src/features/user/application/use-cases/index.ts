@@ -8,13 +8,11 @@ import { NewPasswordUseCase } from './newPassword.usecase';
 export * from './createUser.usecase';
 export * from './confirmationRegistration.usecase';
 export * from './userPasswordRecovery.usecase';
-export * from './confirmationRecoveryCode.usecase';
 export * from './newPassword.usecase';
 
 export const USER_USE_CASES: Type<ICommandHandler>[] = [
   CreateUserUseCase,
   ConfirmationRegistrationUseCase,
   UserPasswordRecoveryUseCase,
-  ConfirmationRegistrationUseCase,
   NewPasswordUseCase,
 ];

@@ -28,7 +28,7 @@ export class NewPasswordDto {
   @IsString()
   @Length(6, 20, { message: ERROR_LENGTH_PASSWORD })
   @Validate(IsPasswordMustContain)
-  newPassword: string;
+  password: string;
 
   @ApiProperty({
     description: 'Password confirmation',
@@ -41,7 +41,7 @@ export class NewPasswordDto {
             _\` \{ \| \} ~`,
   })
   @Validate(IsPasswordsMatchingConstraint)
-  PasswordConfirmation: string;
+  passwordConfirmation: string;
 
   @ApiProperty({
     description: 'Recovery password code',

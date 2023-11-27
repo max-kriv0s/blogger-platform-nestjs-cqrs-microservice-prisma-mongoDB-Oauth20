@@ -36,7 +36,7 @@ export class EmailManagerService {
   }
 
   @OnEvent(USER_UPDATED_EVENT_NAME)
-  async sendPasswordRecoveryMessage(payload: UserInfoUpdatedEvent) {
+  async sendResendingEmailConfirmationMessage(payload: UserInfoUpdatedEvent) {
     const textMessage = `<h1>Resending email confirmation</h1>
           <p>To finish registration please follow the link below:
               <a href='${this.APP_URL}?code=${payload.configmationCode}'>complete registration</a>

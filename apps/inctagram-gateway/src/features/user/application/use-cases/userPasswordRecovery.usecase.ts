@@ -48,12 +48,15 @@ export class UserPasswordRecoveryUseCase
     }
 
     if (!user.userRegistrationInfo.isConfirmed) {
-      this.userService.updateConfirmationCode(
+      await this.userService.updateConfirmationCode(
         user.userRegistrationInfo.id,
         user.email,
       );
       return Result.Ok();
     }
+
+    await this.updateRecoveryPassword(user.userRegistrationInfo.id, user.email);
+    return Result.Ok();
   }
 
   private async updateRecoveryPassword(userInfoId: string, email: string) {

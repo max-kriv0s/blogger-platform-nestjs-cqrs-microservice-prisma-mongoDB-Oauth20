@@ -1,24 +1,28 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
-import { EmailManagerModule } from '../src/core/email-manager/email-manager.module';
 import { EmailAdapter } from '../src/infrastructure';
 import { AuthTestHelper } from './testHelpers/auth.test.helper';
 import {
   getErrorMessagesBadRequest,
   getAppForE2ETesting,
   randomString,
+  randomUUID,
+  paramMock,
 } from './utils/tests.utils';
 import { endpoints } from '../src/features/auth/api';
 import { ResponseUserDto } from '../src/features/user/responses';
 import {
   ERROR_EMAIL_IS_ALREADY_REGISTRED,
   ERROR_FORMAT_EMAIL,
+  ERROR_INCORRECT_RECOVER_CODE,
   ERROR_LENGTH_PASSWORD,
   ERROR_LENGTH_USERNAME,
   ERROR_PASSWORDS_MUST_MATCH,
   ERROR_PASSWORD_MUST_CONTAIN,
+  ERROR_USER_WITH_THIS_EMAIL_NOT_EXIST,
 } from '../src/features/user/user.constants';
+import { NewPasswordDto } from '../src/features/user/dto';
 
 jest.setTimeout(15000);
 
@@ -34,7 +38,7 @@ describe('AuthController (e2e) test', () => {
 
   beforeAll(async () => {
     const testingModule = await Test.createTestingModule({
-      imports: [EmailManagerModule, AppModule],
+      imports: [AppModule],
     })
       .overrideProvider(EmailAdapter)
       .useValue(emailAdapterMock)
@@ -43,6 +47,10 @@ describe('AuthController (e2e) test', () => {
     app = await getAppForE2ETesting(testingModule);
 
     authTestHelper = new AuthTestHelper(app);
+  });
+
+  afterEach(async () => {
+    jest.resetAllMocks();
   });
 
   afterAll(async () => {
@@ -66,8 +74,8 @@ describe('AuthController (e2e) test', () => {
 
       await new Promise((pause) => setTimeout(pause, 100));
 
-      expect(emailAdapterMock.sendEmail).toHaveBeenCalled();
-      expect(emailAdapterMock.sendEmail.mock.calls[0][0]).toBe(userDto.email);
+      const mockParam = paramMock(emailAdapterMock.sendEmail.mock);
+      expect(mockParam[0]).toBe(userDto.email);
     });
     it(`${endpoints.registration()} (POST) - registration the user incorrect username'`, async () => {
       const userDto = authTestHelper.userDto();
@@ -200,11 +208,10 @@ describe('AuthController (e2e) test', () => {
       await new Promise((pause) => setTimeout(pause, 100));
 
       expect(emailAdapterMock.sendEmail).toHaveBeenCalled();
-      const mock = emailAdapterMock.sendEmail.mock;
-      const lastMockCall = mock.calls.length - 1;
-      expect(mock.calls[lastMockCall][0]).toBe(userDto.email);
+      const mockParam = paramMock(emailAdapterMock.sendEmail.mock);
+      expect(mockParam[0]).toBe(userDto.email);
 
-      const message = mock.calls[lastMockCall][2];
+      const message = mockParam[2];
       const startIndex = message.indexOf('code');
       expect(startIndex).not.toBe(-1);
 
@@ -242,6 +249,137 @@ describe('AuthController (e2e) test', () => {
         return call[0] === userDto.email;
       });
       expect(callWithCurrentEmail.length).toBe(2);
+    });
+  });
+
+  describe('Password recovery', () => {
+    it(`${endpoints.passwordRecovery} (POST) Password recovery correct data`, async () => {
+      const userDto = authTestHelper.userDto();
+
+      await authTestHelper.registrationUser(userDto);
+      await new Promise((pause) => setTimeout(pause, 100));
+
+      expect(emailAdapterMock.sendEmail).toHaveBeenCalled();
+      let mockParam = paramMock(emailAdapterMock.sendEmail.mock);
+      expect(mockParam[0]).toBe(userDto.email);
+
+      const message = mockParam[2];
+      let startIndex = message.indexOf('code');
+      expect(startIndex).not.toBe(-1);
+
+      const codeConfirmation = message.slice(
+        startIndex + 5,
+        message.indexOf("'", startIndex) !== -1
+          ? message.indexOf("'", startIndex)
+          : message.length,
+      );
+
+      await authTestHelper.confirmRegistration({ code: codeConfirmation });
+
+      await authTestHelper.passwordRecovery({ email: userDto.email });
+      await new Promise((pause) => setTimeout(pause, 100));
+
+      mockParam = paramMock(emailAdapterMock.sendEmail.mock);
+      expect(mockParam[0]).toBe(userDto.email);
+      const messageRecoveryCode = mockParam[2];
+
+      startIndex = messageRecoveryCode.indexOf('recoveryCode');
+      expect(startIndex).not.toBe(-1);
+    });
+
+    it(`${endpoints.passwordRecovery} (POST) Password recovery incorrect data`, async () => {
+      const userDto = authTestHelper.userDto();
+      await authTestHelper.registrationUser(userDto);
+
+      const email = '1' + userDto.email;
+      const { body } = await authTestHelper.passwordRecovery(
+        { email },
+        { expectedCode: HttpStatus.BAD_REQUEST },
+      );
+
+      errorMessagesBadRequest.message[0].field = 'email';
+      errorMessagesBadRequest.message[0].message =
+        ERROR_USER_WITH_THIS_EMAIL_NOT_EXIST;
+
+      expect(body).toEqual(errorMessagesBadRequest);
+    });
+
+    it(`${endpoints.passwordRecovery} (POST) Unauthorized user I didn't receive the link by email`, async () => {
+      const userDto = authTestHelper.userDto();
+
+      await authTestHelper.registrationUser(userDto);
+      await new Promise((pause) => setTimeout(pause, 100));
+      await authTestHelper.passwordRecovery({ email: userDto.email });
+      await new Promise((pause) => setTimeout(pause, 100));
+
+      const mockParam = paramMock(emailAdapterMock.sendEmail.mock);
+      expect(mockParam[0]).toBe(userDto.email);
+      const message = mockParam[2];
+
+      const startIndex = message.indexOf('code');
+      expect(startIndex).not.toBe(-1);
+    });
+  });
+
+  describe('New password', () => {
+    it(`${endpoints.newPassword} (POST) New password correct data`, async () => {
+      const userDto = authTestHelper.userDto();
+
+      await authTestHelper.registrationUser(userDto);
+      await new Promise((pause) => setTimeout(pause, 100));
+
+      let mockParam = paramMock(emailAdapterMock.sendEmail.mock);
+      const message = mockParam[2];
+      let startIndex = message.indexOf('code');
+
+      const codeConfirmation = message.slice(
+        startIndex + 5,
+        message.indexOf("'", startIndex) !== -1
+          ? message.indexOf("'", startIndex)
+          : message.length,
+      );
+
+      await authTestHelper.confirmRegistration({ code: codeConfirmation });
+
+      await authTestHelper.passwordRecovery({ email: userDto.email });
+      await new Promise((pause) => setTimeout(pause, 100));
+
+      mockParam = paramMock(emailAdapterMock.sendEmail.mock);
+      expect(mockParam[0]).toBe(userDto.email);
+      const messageRecoveryCode = mockParam[2];
+
+      startIndex = messageRecoveryCode.indexOf('recoveryCode');
+      const recoveryCode = messageRecoveryCode.slice(
+        startIndex + 13,
+        messageRecoveryCode.indexOf("'", startIndex) !== -1
+          ? messageRecoveryCode.indexOf("'", startIndex)
+          : messageRecoveryCode.length,
+      );
+
+      const newPassword = `${randomString(10)}TU1!`;
+      const data: NewPasswordDto = {
+        recoveryCode,
+        password: newPassword,
+        passwordConfirmation: newPassword,
+      };
+      await authTestHelper.newPassword(data);
+    });
+
+    it(`${endpoints.newPassword} (POST) New password incorrect data`, async () => {
+      const newPassword = `${randomString(10)}TU1!`;
+      const data: NewPasswordDto = {
+        recoveryCode: randomUUID(),
+        password: newPassword,
+        passwordConfirmation: newPassword,
+      };
+      const { body } = await authTestHelper.newPassword(data, {
+        expectedCode: HttpStatus.BAD_REQUEST,
+      });
+
+      errorMessagesBadRequest.message[0].field = 'recoveryCode';
+      errorMessagesBadRequest.message[0].message = ERROR_INCORRECT_RECOVER_CODE;
+
+      expect(body).toEqual(errorMessagesBadRequest);
     });
   });
 });

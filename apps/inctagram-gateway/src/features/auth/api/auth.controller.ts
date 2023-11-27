@@ -5,7 +5,7 @@ import {
   UserPasswordRecoveryDto,
 } from '../../user/dto';
 import { UserFasade } from '../../user/user.fasade';
-import { ConfirmationCodeDto, ConfirmationRecoveryCodeDto } from '../dto';
+import { ConfirmationCodeDto } from '../dto';
 import {
   ApiBadRequestResponse,
   ApiNoContentResponse,
@@ -21,6 +21,10 @@ const baseUrl = '/auth';
 export const endpoints = {
   registration: () => `${baseUrl}/registration`,
   registrationConfirmation: () => `${baseUrl}/registration-confirmation`,
+  passwordRecovery: () => `${baseUrl}/password-recovery`,
+  passwordRecoveryConfirmation: () =>
+    `${baseUrl}/password-recovery-confirmation`,
+  newPassword: () => `${baseUrl}/new-password`,
 };
 @ApiTags('Auth')
 @Controller('auth')
@@ -71,28 +75,14 @@ export class AuthController {
   @ApiBadRequestResponse({ type: BadRequestResponse })
   @Post('password-recovery')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async passwordRecovery(passwordRRecoveryDto: UserPasswordRecoveryDto) {
+  async passwordRecovery(
+    @Body() passwordRRecoveryDto: UserPasswordRecoveryDto,
+  ) {
     const recoveryResult = await this.userFasade.useCases.passwordRecovery(
       passwordRRecoveryDto,
     );
     if (!recoveryResult.isSuccess) {
       throw recoveryResult.err;
-    }
-  }
-
-  @ApiOperation({
-    summary: 'User recovery code confirmation',
-  })
-  @ApiNoContentResponse()
-  @ApiBadRequestResponse({ type: BadRequestResponse })
-  @Post('password-recovery-confirmation')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async passwordRecoveryConfirmation(recoveryDto: ConfirmationRecoveryCodeDto) {
-    const confirmationResult =
-      await this.userFasade.useCases.confirmationPasswordRecovery(recoveryDto);
-
-    if (!confirmationResult.isSuccess) {
-      throw confirmationResult.err;
     }
   }
 
@@ -103,10 +93,10 @@ export class AuthController {
   @ApiBadRequestResponse({ type: BadRequestResponse })
   @Post('new-password')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async newPassword(dto: NewPasswordDto) {
+  async newPassword(@Body() dto: NewPasswordDto) {
     const updateResult = await this.userFasade.useCases.newPassword(dto);
     if (!updateResult.isSuccess) {
-      return updateResult.err;
+      throw updateResult.err;
     }
   }
 }

@@ -6,12 +6,11 @@ import { ResponseUserDto } from './responses';
 import { User } from '@prisma/client';
 import { Result } from '../../core/result';
 import {
-  ConfirmationRecoveryCodeCommand,
   ConfirmationRegistrationCommand,
   CreateUserCommand,
   NewPasswordCommand,
 } from './application';
-import { ConfirmationCodeDto, ConfirmationRecoveryCodeDto } from '../auth/dto';
+import { ConfirmationCodeDto } from '../auth/dto';
 import { UserPasswordRecoveryCommand } from './application/use-cases/userPasswordRecovery.usecase';
 
 @Injectable()
@@ -26,8 +25,6 @@ export class UserFasade {
       this.confirmationRegistration(confirmDto),
     passwordRecovery: (passwordRRecoveryDto: UserPasswordRecoveryDto) =>
       this.passwordRecovery(passwordRRecoveryDto),
-    confirmationPasswordRecovery: (recoveryDto: ConfirmationRecoveryCodeDto) =>
-      this.confirmationPasswordRecovery(recoveryDto),
     newPassword: (dto: NewPasswordDto) => this.newPassword(dto),
   };
   queries = { getUserViewById: (id: string) => this.getUserViewById(id) };
@@ -52,14 +49,6 @@ export class UserFasade {
   ): Promise<Result> {
     return this.commandBus.execute<UserPasswordRecoveryCommand, Result>(
       new UserPasswordRecoveryCommand(passwordRRecoveryDto),
-    );
-  }
-
-  private async confirmationPasswordRecovery(
-    recoveryDto: ConfirmationRecoveryCodeDto,
-  ): Promise<Result> {
-    return this.commandBus.execute<ConfirmationRecoveryCodeCommand, Result>(
-      new ConfirmationRecoveryCodeCommand(recoveryDto),
     );
   }
 
