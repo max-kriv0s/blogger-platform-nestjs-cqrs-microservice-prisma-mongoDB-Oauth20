@@ -26,10 +26,10 @@ export class CreateUserDto {
     maxLength: 30,
     pattern: '0-9; A-Z; a-z; _ ; -',
   })
-  @IsNotEmpty()
-  @IsString()
-  @Length(6, 30, { message: ERROR_LENGTH_USERNAME })
   @Matches('^[a-zA-Z0-9_-]*$')
+  @Length(6, 30, { message: ERROR_LENGTH_USERNAME })
+  @IsString()
+  @IsNotEmpty()
   username: string;
 
   @ApiProperty({
@@ -37,14 +37,13 @@ export class CreateUserDto {
     type: 'string',
     example: 'test@gmail.com',
   })
-  @IsNotEmpty()
-  @IsString()
   @IsEmail(
     {},
     {
       message: ERROR_FORMAT_EMAIL,
     },
   )
+  @IsNotEmpty()
   email: string;
 
   @ApiProperty({
@@ -57,10 +56,10 @@ export class CreateUserDto {
               !"#$%& '()*+,-./:;<=>? @ [\]^
               _\` \{ \| \} ~`,
   })
-  @IsNotEmpty()
-  @IsString()
-  @Length(6, 20, { message: ERROR_LENGTH_PASSWORD })
   @Validate(IsPasswordMustContain)
+  @Length(6, 20, { message: ERROR_LENGTH_PASSWORD })
+  @IsString()
+  @IsNotEmpty()
   password: string;
 
   @ApiProperty({

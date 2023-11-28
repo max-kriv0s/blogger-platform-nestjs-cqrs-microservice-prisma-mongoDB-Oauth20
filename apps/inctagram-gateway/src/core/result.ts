@@ -1,4 +1,4 @@
-import { CustomError } from './exceptions/customException';
+import { CustomError } from './exceptions';
 
 export class Result<T = null> {
   constructor(

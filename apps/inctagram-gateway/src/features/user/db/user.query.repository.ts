@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/prisma/prisma.servise';
 import { ResponseUserDto } from '../responses';
-import { Result } from '../../../core/result';
-import { NotFoundError } from '../../../core/exceptions';
+import { NotFoundError, Result } from '../../../core';
 import { USER_NOT_FOUND } from '../user.constants';
 
 @Injectable()

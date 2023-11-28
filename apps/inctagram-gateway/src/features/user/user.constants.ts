@@ -11,6 +11,7 @@ export const ERROR_LENGTH_PASSWORD = `
 
 export const ERROR_PASSWORDS_MUST_MATCH = 'Passwords must match';
 export const ERROR_PASSWORD_MUST_CONTAIN = `Password must contain 0-9, a-z, A-Z, ! \" # $ % & \' ( ) * + , - . / : ; < = > ? @ [ \\ ] ^ _\` \{ \| \} ~`;
+export const ERROR_PASSWORD_IS_WRONG = 'Password is wrong';
 
 export const ERROR_EMAIL_IS_ALREADY_REGISTRED =
   'User with this email is already registered';
@@ -25,3 +26,5 @@ export const ERROR_INCORRECT_RECOVER_CODE = 'Incorrect recovery code';
 
 export const ERROR_USER_WITH_THIS_EMAIL_NOT_EXIST =
   "User with this email doesn't exist";
+
+export const ERROR_USER_NOT_CONFIRMED = 'User is not confirmed';

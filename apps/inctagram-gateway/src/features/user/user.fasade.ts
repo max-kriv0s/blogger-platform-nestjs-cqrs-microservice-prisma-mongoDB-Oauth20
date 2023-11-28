@@ -11,6 +11,9 @@ import {
   NewPasswordCommand,
 } from './application';
 import { ConfirmationCodeDto } from '../auth/dto';
+import { CheckUserCredentialsCommand } from './application/use-cases/checkUserCredentials';
+import { LoginDto } from '../auth/dto/login.dto';
+import { UserIdType } from './types/userId.type';
 import { UserPasswordRecoveryCommand } from './application/use-cases/userPasswordRecovery.usecase';
 
 @Injectable()
@@ -19,10 +22,13 @@ export class UserFasade {
     private readonly commandBus: CommandBus,
     private readonly userQueryRepo: UserQueryRepository,
   ) {}
+
   useCases = {
     createUser: (userDto: CreateUserDto) => this.createUser(userDto),
     confirmationRegistration: (confirmDto: ConfirmationCodeDto) =>
       this.confirmationRegistration(confirmDto),
+    checkUserCredentials: (loginDto: LoginDto): Promise<Result<UserIdType>> =>
+      this.checkUserCredentials(loginDto),
     passwordRecovery: (passwordRRecoveryDto: UserPasswordRecoveryDto) =>
       this.passwordRecovery(passwordRRecoveryDto),
     newPassword: (dto: NewPasswordDto) => this.newPassword(dto),
@@ -42,6 +48,13 @@ export class UserFasade {
       ConfirmationRegistrationCommand,
       Result<boolean>
     >(new ConfirmationRegistrationCommand(confirmDto));
+  }
+
+  private async checkUserCredentials(loginDto: LoginDto) {
+    return this.commandBus.execute<
+      CheckUserCredentialsCommand,
+      Result<UserIdType>
+    >(new CheckUserCredentialsCommand(loginDto));
   }
 
   private async passwordRecovery(
