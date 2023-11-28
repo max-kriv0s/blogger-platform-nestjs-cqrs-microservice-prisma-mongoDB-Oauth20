@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { UserFasade } from '../../user/user.fasade';
+import { LoginDto } from '../dto/login.dto';
 
 @Injectable()
 export class PasswordStrategy extends PassportStrategy(Strategy) {
@@ -16,11 +17,16 @@ export class PasswordStrategy extends PassportStrategy(Strategy) {
     password: string,
   ): Promise<{ id: string } | any> {
     // validate input loginOrEmail and password
-    //await validateLoginOrEmail(loginOrEmail, password);
+    const loginDto = new LoginDto(email, password);
+    await loginDto.validate();
+
     //if input values are correct, check credentials
-    // const userInfo = await this.userFacade.useCases.
+    const result = await this.userFacade.useCases.checkUserCredentials(
+      loginDto,
+    );
     // if user isn`t found in db, should take error
-    // if (!userInfo) throw new UnauthorizedException();
-    //return userInfo;
+    if (!result.isSuccess) throw result.err;
+
+    return result.value;
   }
 }

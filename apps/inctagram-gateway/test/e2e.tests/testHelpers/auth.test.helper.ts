@@ -1,12 +1,13 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { endpoints } from '../../src/features/auth/api';
-import { CreateUserDto } from '../../src/features/user/dto';
-import { ConfirmationCodeDto } from '../../src/features/auth/dto';
+import { endpoints } from '../../../src/features/auth/api';
+import { CreateUserDto } from '../../../src/features/user/dto';
+import { ConfirmationCodeDto } from '../../../src/features/auth/dto';
 import { getGlobalPrefix, randomString } from '../utils/tests.utils';
 
 export class AuthTestHelper {
   globalPrefix = getGlobalPrefix();
+
   constructor(private app: INestApplication) {}
 
   userDto(): CreateUserDto {
