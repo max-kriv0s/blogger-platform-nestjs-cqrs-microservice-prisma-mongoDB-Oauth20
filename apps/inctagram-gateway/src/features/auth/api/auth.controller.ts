@@ -1,4 +1,15 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Response } from 'express';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Ip,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateUserDto } from '../../user/dto';
 import { UserFasade } from '../../user/user.fasade';
 import { ConfirmationCodeDto } from '../dto';
@@ -11,6 +22,12 @@ import {
 } from '@nestjs/swagger';
 import { ResponseUserDto } from '../../user/responses';
 import { BadRequestResponse } from '../../../core/responses';
+import { DeviceFacade } from '../../device/device.facade';
+import { PasswordAuthGuard } from '../guards/password.guard';
+import { CurrentUserId } from '../../../core/decorators/currentUserId.decorator';
+import { UserIdType } from '../../user/types/userId.type';
+import { DeviceDto } from '../../device/dto/device.dto';
+import { ResponseAccessTokenDto } from '../../device/responses/responseAccessToken.dto';
 
 const baseUrl = '/auth';
 
@@ -18,10 +35,14 @@ export const endpoints = {
   registration: () => `${baseUrl}/registration`,
   registrationConfirmation: () => `${baseUrl}/registration-confirmation`,
 };
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly userFasade: UserFasade) {}
+  constructor(
+    private readonly userFasade: UserFasade,
+    private readonly deviceFacade: DeviceFacade,
+  ) {}
 
   @ApiOperation({
     summary: 'User registration',
@@ -58,5 +79,27 @@ export class AuthController {
     if (!resultConfirmed.isSuccess) {
       throw resultConfirmed.err;
     }
+  }
+
+  @Post('login')
+  @UseGuards(PasswordAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async login(
+    @Ip() ip: string,
+    @Headers('user-agent') title: string,
+    @Res({ passthrough: true }) response: Response,
+    @CurrentUserId() userIdDto: UserIdType,
+  ): Promise<ResponseAccessTokenDto> {
+    const result = await this.deviceFacade.useCases.createDevice(
+      new DeviceDto(ip, title, userIdDto.userId),
+    );
+    const { accessToken, refreshToken } = result.value;
+
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return new ResponseAccessTokenDto(accessToken);
   }
 }

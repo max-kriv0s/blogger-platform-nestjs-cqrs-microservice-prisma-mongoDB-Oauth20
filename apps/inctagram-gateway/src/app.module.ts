@@ -4,6 +4,7 @@ import { AuthModule } from './features/auth/auth.module';
 import { PrismaModule } from './core/prisma/prisma.module';
 import { UserModule } from './features/user/user.module';
 import { EmailManagerModule } from './core/email-manager/email-manager.module';
+import { DeviceModule } from './features/device/device.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { EmailManagerModule } from './core/email-manager/email-manager.module';
     PrismaModule,
     AuthModule,
     UserModule,
+    DeviceModule,
     EmailManagerModule,
   ],
   controllers: [],

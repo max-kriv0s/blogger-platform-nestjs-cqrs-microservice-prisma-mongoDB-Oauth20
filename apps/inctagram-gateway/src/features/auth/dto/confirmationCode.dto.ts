@@ -8,7 +8,7 @@ export class ConfirmationCodeDto {
     type: 'string',
     example: uuidv4(),
   })
-  @IsNotEmpty()
   @IsUUID()
+  @IsNotEmpty()
   code: string;
 }
