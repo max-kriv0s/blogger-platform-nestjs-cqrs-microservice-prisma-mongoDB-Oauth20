@@ -35,4 +35,13 @@ export class UserRepository {
       },
     });
   }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.prismaService.user.findUnique({
+      where: { email },
+      include: {
+        userRegistrationInfo: { select: { isConfirmed: true } },
+      },
+    });
+  }
 }
