@@ -22,8 +22,6 @@ export const endpoints = {
   registration: () => `${baseUrl}/registration`,
   registrationConfirmation: () => `${baseUrl}/registration-confirmation`,
   passwordRecovery: () => `${baseUrl}/password-recovery`,
-  passwordRecoveryConfirmation: () =>
-    `${baseUrl}/password-recovery-confirmation`,
   newPassword: () => `${baseUrl}/new-password`,
 };
 @ApiTags('Auth')
