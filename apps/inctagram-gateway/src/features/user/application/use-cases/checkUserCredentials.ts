@@ -27,10 +27,9 @@ export class CheckUserCredentialsUseCase
     loginDto,
   }: CheckUserCredentialsCommand): Promise<Result<UserIdType>> {
     const user = await this.userRepository.findByEmail(loginDto.email);
-    //console.log('user in check credentials:', user);
-    // check there is user or not
+
     if (!user) return Result.Err(new UnauthorizedError(USER_NOT_FOUND));
-    //check user password
+
     const isMatched = this.userService.isCorrectPassword(
       loginDto.password,
       user.hashPassword,

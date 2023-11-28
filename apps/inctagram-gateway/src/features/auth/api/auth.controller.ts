@@ -10,7 +10,11 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto } from '../../user/dto';
+import {
+  CreateUserDto,
+  NewPasswordDto,
+  UserPasswordRecoveryDto,
+} from '../../user/dto';
 import { UserFasade } from '../../user/user.fasade';
 import { ConfirmationCodeDto } from '../dto';
 import {
@@ -34,6 +38,8 @@ const baseUrl = '/auth';
 export const endpoints = {
   registration: () => `${baseUrl}/registration`,
   registrationConfirmation: () => `${baseUrl}/registration-confirmation`,
+  passwordRecovery: () => `${baseUrl}/password-recovery`,
+  newPassword: () => `${baseUrl}/new-password`,
 };
 
 @ApiTags('Auth')
@@ -74,10 +80,42 @@ export class AuthController {
   @Post('registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
   async confirmRegistration(@Body() confirmDto: ConfirmationCodeDto) {
-    const resultConfirmed =
+    const confirmationResult =
       await this.userFasade.useCases.confirmationRegistration(confirmDto);
-    if (!resultConfirmed.isSuccess) {
-      throw resultConfirmed.err;
+    if (!confirmationResult.isSuccess) {
+      throw confirmationResult.err;
+    }
+  }
+
+  @ApiOperation({
+    summary: 'User password recovery',
+  })
+  @ApiNoContentResponse()
+  @ApiBadRequestResponse({ type: BadRequestResponse })
+  @Post('password-recovery')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async passwordRecovery(
+    @Body() passwordRRecoveryDto: UserPasswordRecoveryDto,
+  ) {
+    const recoveryResult = await this.userFasade.useCases.passwordRecovery(
+      passwordRRecoveryDto,
+    );
+    if (!recoveryResult.isSuccess) {
+      throw recoveryResult.err;
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Changing the user password',
+  })
+  @ApiNoContentResponse()
+  @ApiBadRequestResponse({ type: BadRequestResponse })
+  @Post('new-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async newPassword(@Body() dto: NewPasswordDto) {
+    const updateResult = await this.userFasade.useCases.newPassword(dto);
+    if (!updateResult.isSuccess) {
+      throw updateResult.err;
     }
   }
 

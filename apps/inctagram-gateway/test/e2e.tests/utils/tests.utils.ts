@@ -48,6 +48,11 @@ export function randomUUID() {
   return uuidv4();
 }
 
+export function paramMock(mock) {
+  const lastIndex = mock.calls.length - 1;
+  return mock.calls[lastIndex];
+}
+
 export function getErrorMessagesBadRequest() {
   return {
     timestamp: expect.any(String),

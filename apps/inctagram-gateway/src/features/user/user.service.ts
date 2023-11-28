@@ -5,6 +5,12 @@ import { v4 as uuidv4 } from 'uuid';
 import add from 'date-fns/add';
 import { UserConfig } from './config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import {
+  USER_CREATED_EVENT_NAME,
+  USER_UPDATED_EVENT_NAME,
+  UserInfoCreatedEvent,
+  UserInfoUpdatedEvent,
+} from './application';
 
 @Injectable()
 export class UserService {
@@ -36,4 +42,30 @@ export class UserService {
     };
   }
 
+  createUserInfoCreatedEvent(email: string, confirmationCode: string) {
+    this.eventEmitter.emit(
+      USER_CREATED_EVENT_NAME,
+      new UserInfoCreatedEvent(email, confirmationCode),
+    );
+  }
+
+  createUserInfoUpdatedEvent(email: string, confirmationCode: string) {
+    this.eventEmitter.emit(
+      USER_UPDATED_EVENT_NAME,
+      new UserInfoUpdatedEvent(email, confirmationCode),
+    );
+  }
+
+  async updateConfirmationCode(userInfoId: string, email: string) {
+    const confirmationCode = this.generateConfirmationCode();
+    const updatedUserInfo = await this.userRegistrationInfoRepo.update(
+      userInfoId,
+      {
+        confirmationCode: confirmationCode.code,
+        expirationConfirmationCode: confirmationCode.expiration,
+      },
+    );
+    this.createUserInfoUpdatedEvent(email, confirmationCode.code);
+    return updatedUserInfo;
+  }
 }
