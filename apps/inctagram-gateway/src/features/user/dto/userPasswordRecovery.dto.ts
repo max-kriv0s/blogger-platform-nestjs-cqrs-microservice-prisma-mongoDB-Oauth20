@@ -8,13 +8,13 @@ export class UserPasswordRecoveryDto {
     type: 'string',
     example: 'test@gmail.com',
   })
-  @IsNotEmpty()
-  @IsString()
   @IsEmail(
     {},
     {
       message: ERROR_FORMAT_EMAIL,
     },
   )
+  @IsString()
+  @IsNotEmpty()
   email: string;
 }
