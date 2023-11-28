@@ -24,10 +24,10 @@ export class NewPasswordDto {
                   !"#$%& '()*+,-./:;<=>? @ [\]^
                   _\` \{ \| \} ~`,
   })
-  @IsNotEmpty()
-  @IsString()
-  @Length(6, 20, { message: ERROR_LENGTH_PASSWORD })
   @Validate(IsPasswordMustContain)
+  @Length(6, 20, { message: ERROR_LENGTH_PASSWORD })
+  @IsString()
+  @IsNotEmpty()
   password: string;
 
   @ApiProperty({
@@ -48,7 +48,7 @@ export class NewPasswordDto {
     type: 'string',
     example: uuidv4(),
   })
-  @IsNotEmpty()
   @IsUUID()
+  @IsNotEmpty()
   recoveryCode: string;
 }
