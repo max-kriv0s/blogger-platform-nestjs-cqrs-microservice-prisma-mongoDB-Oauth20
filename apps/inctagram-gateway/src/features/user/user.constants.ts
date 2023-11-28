@@ -22,5 +22,9 @@ export const ERROR_USERNAME_IS_ALREADY_REGISTRED =
 export const USER_NOT_FOUND = 'User not found';
 
 export const ERROR_INCORRECT_CONFIRMATION_CODE = 'Incorrect confirmation code';
+export const ERROR_INCORRECT_RECOVER_CODE = 'Incorrect recovery code';
+
+export const ERROR_USER_WITH_THIS_EMAIL_NOT_EXIST =
+  "User with this email doesn't exist";
 
 export const ERROR_USER_NOT_CONFIRMED = 'User is not confirmed';

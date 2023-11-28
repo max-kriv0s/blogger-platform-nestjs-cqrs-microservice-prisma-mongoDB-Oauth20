@@ -3,8 +3,11 @@ import { AppConfig } from '../config/application';
 import { EmailAdapter } from '../../infrastructure';
 import {
   USER_CREATED_EVENT_NAME,
+  USER_RECOVERY_PASSWORD_EVENT_NAME,
+  USER_UPDATED_EVENT_NAME,
   UserInfoCreatedEvent,
   UserInfoUpdatedEvent,
+  UserRecoveryPasswordEvent,
 } from '../../features/user/application/events';
 import { OnEvent } from '@nestjs/event-emitter';
 
@@ -32,8 +35,8 @@ export class EmailManagerService {
     );
   }
 
-  @OnEvent('confirmationCode.updated')
-  async sendPasswordRecoveryMessage(payload: UserInfoUpdatedEvent) {
+  @OnEvent(USER_UPDATED_EVENT_NAME)
+  async sendResendingEmailConfirmationMessage(payload: UserInfoUpdatedEvent) {
     const textMessage = `<h1>Resending email confirmation</h1>
           <p>To finish registration please follow the link below:
               <a href='${this.APP_URL}?code=${payload.configmationCode}'>complete registration</a>
@@ -46,12 +49,17 @@ export class EmailManagerService {
     );
   }
 
-  async sendPasswordRecovery(email: string, recoveryCode: string) {
+  @OnEvent(USER_RECOVERY_PASSWORD_EVENT_NAME)
+  async sendPasswordRecovery(payload: UserRecoveryPasswordEvent) {
     const textMessage = `<h1>Password recovery</h1>
           <p>To finish password recovery please follow the link below:
-              <a href='${this.APP_URL}/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
+              <a href='${this.APP_URL}?recoveryCode=${payload.recoveryCode}'>recovery password</a>
           </p>`;
 
-    await this.emailAdapter.sendEmail(email, 'Password recovery', textMessage);
+    await this.emailAdapter.sendEmail(
+      payload.email,
+      'Password recovery',
+      textMessage,
+    );
   }
 }

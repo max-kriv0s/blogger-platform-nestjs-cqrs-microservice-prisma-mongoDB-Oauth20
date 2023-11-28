@@ -27,11 +27,17 @@ export class UserRegistrationInfoRepository {
     });
   }
 
-  async findUserByCodeConfirmation(
+  async findByCodeConfirmation(
     code: string,
   ): Promise<UserRegistrationInfo | null> {
     return this.prismaService.userRegistrationInfo.findFirst({
       where: { confirmationCode: code },
+    });
+  }
+
+  async findByRecoveryCode(recoveryCode: string) {
+    return this.prismaService.userRegistrationInfo.findFirst({
+      where: { recoveryCode },
     });
   }
 }
