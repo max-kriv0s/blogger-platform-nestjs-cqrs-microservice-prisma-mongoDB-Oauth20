@@ -24,7 +24,7 @@ import { ResponseUserDto } from '../../user/responses';
 import { BadRequestResponse } from '../../../core/responses';
 import { DeviceFacade } from '../../device/device.facade';
 import { PasswordAuthGuard } from '../guards/password.guard';
-import { CurrentUserInfo } from '../../../core/decorators/currentUserId.decorator';
+import { CurrentUserId } from '../../../core/decorators/currentUserId.decorator';
 import { UserIdType } from '../../user/types/userId.type';
 import { DeviceDto } from '../../device/dto/device.dto';
 import { ResponseAccessTokenDto } from '../../device/responses/responseAccessToken.dto';
@@ -88,7 +88,7 @@ export class AuthController {
     @Ip() ip: string,
     @Headers('user-agent') title: string,
     @Res({ passthrough: true }) response: Response,
-    @CurrentUserInfo() userIdDto: UserIdType,
+    @CurrentUserId() userIdDto: UserIdType,
   ): Promise<ResponseAccessTokenDto> {
     const result = await this.deviceFacade.useCases.createDevice(
       new DeviceDto(ip, title, userIdDto.userId),
