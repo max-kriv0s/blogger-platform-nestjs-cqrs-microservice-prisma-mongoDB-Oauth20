@@ -1,24 +1,24 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { AppModule } from '../src/app.module';
-import { EmailManagerModule } from '../src/core/email-manager/email-manager.module';
-import { EmailAdapter } from '../src/infrastructure';
+import { AppModule } from '../../src/app.module';
+import { EmailManagerModule } from '../../src/core/email-manager/email-manager.module';
+import { EmailAdapter } from '../../src/infrastructure';
 import { AuthTestHelper } from './testHelpers/auth.test.helper';
 import {
-  getErrorMessagesBadRequest,
   getAppForE2ETesting,
+  getErrorMessagesBadRequest,
   randomString,
 } from './utils/tests.utils';
-import { endpoints } from '../src/features/auth/api';
-import { ResponseUserDto } from '../src/features/user/responses';
+import { endpoints } from '../../src/features/auth/api';
+import { ResponseUserDto } from '../../src/features/user/responses';
 import {
   ERROR_EMAIL_IS_ALREADY_REGISTRED,
   ERROR_FORMAT_EMAIL,
   ERROR_LENGTH_PASSWORD,
   ERROR_LENGTH_USERNAME,
-  ERROR_PASSWORDS_MUST_MATCH,
   ERROR_PASSWORD_MUST_CONTAIN,
-} from '../src/features/user/user.constants';
+  ERROR_PASSWORDS_MUST_MATCH,
+} from '../../src/features/user/user.constants';
 
 jest.setTimeout(15000);
 
@@ -71,7 +71,7 @@ describe('AuthController (e2e) test', () => {
     });
     it(`${endpoints.registration()} (POST) - registration the user incorrect username'`, async () => {
       const userDto = authTestHelper.userDto();
-      userDto.username = '';
+      userDto.username = 'a';
 
       errorMessagesBadRequest.message[0].field = 'username';
       errorMessagesBadRequest.message[0].message = ERROR_LENGTH_USERNAME;
@@ -138,7 +138,7 @@ describe('AuthController (e2e) test', () => {
       ).body;
       expect(body).toEqual(errorMessagesBadRequest);
 
-      userDto.password = '';
+      userDto.password = 'aaaaaa';
       userDto.passwordConfirm = userDto.password;
 
       errorMessagesBadRequest.message[0].field = 'password';
