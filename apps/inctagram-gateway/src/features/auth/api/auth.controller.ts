@@ -10,8 +10,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto } from '../../user/dto';
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import {
   CreateUserDto,
   NewPasswordDto,
