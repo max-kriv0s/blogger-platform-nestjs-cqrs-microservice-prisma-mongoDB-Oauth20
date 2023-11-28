@@ -1,6 +1,6 @@
-import { configApp } from '../../src/core/config';
+import { configApp } from '../../../src/core/config';
 import { INestApplication } from '@nestjs/common';
-import { PrismaService } from '../../src/core/prisma/prisma.servise';
+import { PrismaService } from '../../../src/core/prisma/prisma.servise';
 import { TestingModule } from '@nestjs/testing';
 import { v4 as uuidv4 } from 'uuid';
 
