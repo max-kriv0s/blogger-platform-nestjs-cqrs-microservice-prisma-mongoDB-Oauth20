@@ -3,7 +3,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { UserFasade } from '../../user/user.fasade';
 import { LoginDto } from '../dto/login.dto';
-import { UnauthorizedError } from '../../../core';
 
 @Injectable()
 export class PasswordStrategy extends PassportStrategy(Strategy) {
@@ -26,7 +25,7 @@ export class PasswordStrategy extends PassportStrategy(Strategy) {
       loginDto,
     );
     // if user isn`t found in db, should take error
-    if (!result.isSuccess) throw new UnauthorizedError(result.err.message);
+    if (!result.isSuccess) throw result.err;
 
     return result.value;
   }

@@ -22,3 +22,5 @@ export const ERROR_USERNAME_IS_ALREADY_REGISTRED =
 export const USER_NOT_FOUND = 'User not found';
 
 export const ERROR_INCORRECT_CONFIRMATION_CODE = 'Incorrect confirmation code';
+
+export const ERROR_USER_NOT_CONFIRMED = 'User is not confirmed';
