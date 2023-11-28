@@ -16,11 +16,11 @@ export class LoginDto {
   }
 
   @ApiProperty()
-  @IsNotEmpty()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Length(3, 50)
   @IsString()
   @IsEmail()
-  @Length(3, 50)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @IsNotEmpty()
   email: string;
 
   @ApiProperty()
