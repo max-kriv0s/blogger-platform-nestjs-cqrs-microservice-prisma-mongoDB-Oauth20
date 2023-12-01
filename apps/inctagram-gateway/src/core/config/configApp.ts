@@ -5,9 +5,10 @@ import { pipesSetup } from './pipes/pipesSetup';
 import { AppModule } from '../../app.module';
 import { useContainer } from 'class-validator';
 import { filterSetup } from './filters';
+import { APP_GLOBAL_PREFIX } from './config.constants';
 
 export function configApp(app: INestApplication) {
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix(APP_GLOBAL_PREFIX);
   app.use(cookieParser());
   app.enableCors();
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
