@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { APP_GLOBAL_PREFIX } from '../config.constants';
 
 export function swaggerSetup(app: INestApplication) {
   const config = new DocumentBuilder()
@@ -9,5 +10,5 @@ export function swaggerSetup(app: INestApplication) {
     .addTag('Intagram')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/doc', app, document);
+  SwaggerModule.setup(`${APP_GLOBAL_PREFIX}/doc`, app, document);
 }
