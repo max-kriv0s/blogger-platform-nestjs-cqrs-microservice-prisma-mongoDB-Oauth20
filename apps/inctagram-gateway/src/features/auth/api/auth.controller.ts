@@ -25,12 +25,14 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ResponseUserDto } from '../../user/responses';
-import { BadRequestResponse } from '../../../core/responses';
+import { BadRequestResponse } from '../../../core';
 import { DeviceFacade } from '../../device/device.facade';
 import { PasswordAuthGuard } from '../guards/password.guard';
 import { CurrentUserId } from '../../../core/decorators/currentUserId.decorator';
-import { DeviceDto } from '../../device/dto/device.dto';
-import { ResponseAccessTokenDto } from '../../device/responses/responseAccessToken.dto';
+import { DeviceDto } from '../../device/dto';
+import { ResponseAccessTokenDto } from '../../device/responses';
+import { CurrentDevice } from '../../../core/decorators/currentDevice.decorator';
+import { RefreshJwtGuard } from '../guards/refreshJwt.guard';
 
 const baseUrl = '/auth';
 
@@ -138,5 +140,22 @@ export class AuthController {
     });
 
     return new ResponseAccessTokenDto(accessToken);
+  }
+
+  @Post('logout')
+  @UseGuards(RefreshJwtGuard)
+  @HttpCode(204)
+  async logout(
+    @Res({ passthrough: true }) response: Response,
+    @CurrentUserId() userId: string,
+    @CurrentDevice() deviceId: string,
+  ): Promise<void> {
+    const result = await this.deviceFacade.useCases.deleteDeviceByIdAndUserId(
+      userId,
+      deviceId,
+    );
+    if (!result.isSuccess) throw result.err;
+    response.clearCookie('refreshToken');
+    return;
   }
 }
