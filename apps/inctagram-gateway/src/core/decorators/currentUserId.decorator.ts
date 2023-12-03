@@ -1,10 +1,11 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { UserIdType } from '../../features/user/types/userId.type';
+import { InternalServerError } from '../exceptions';
 
 export const CurrentUserId = createParamDecorator(
-  (data: unknown, context: ExecutionContext): UserIdType => {
+  (data: unknown, context: ExecutionContext): string => {
     const request = context.switchToHttp().getRequest();
-
-    return request.user as UserIdType;
+    if (request.user || request.user.userId)
+      throw new InternalServerError('Haven`t userId in request');
+    return request.user.userId;
   },
 );
