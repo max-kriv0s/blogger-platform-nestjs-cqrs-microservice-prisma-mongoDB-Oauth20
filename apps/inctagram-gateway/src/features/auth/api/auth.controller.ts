@@ -33,6 +33,7 @@ import { DeviceDto } from '../../device/dto';
 import { ResponseAccessTokenDto } from '../../device/responses';
 import { CurrentDevice } from '../../../core/decorators/currentDevice.decorator';
 import { RefreshJwtGuard } from '../guards/refreshJwt.guard';
+import { LogoutSwaggerDecorator } from '../../../core/swagger/auth/logout.swagger.decorator';
 
 const baseUrl = '/auth';
 
@@ -143,8 +144,9 @@ export class AuthController {
   }
 
   @Post('logout')
+  @LogoutSwaggerDecorator()
   @UseGuards(RefreshJwtGuard)
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async logout(
     @Res({ passthrough: true }) response: Response,
     @CurrentUserId() userId: string,
