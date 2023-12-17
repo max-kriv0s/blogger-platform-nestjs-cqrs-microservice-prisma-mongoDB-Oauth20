@@ -23,9 +23,12 @@ import { ConfirmationCodeDto, GoogleLoginDto, LoginProviderDto } from '../dto';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNoContentResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ResponseUserDto } from '../../user/responses';
 import { BadRequestResponse } from '../../../core';
@@ -205,6 +208,10 @@ export class AuthController {
     return;
   }
 
+  @ApiOkResponse({ type: ResponseAccessTokenDto })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Get('google')
   @ApiOperation({
     summary: 'Oauth2 google authorization',
   })
