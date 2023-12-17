@@ -3,9 +3,9 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class UserConfig {
   getConfirmationCodeLifetime() {
-    return { hours: 1 };
+    return { minutes: 5 };
   }
   getRecoveryCodeLifetime() {
-    return { hours: 1 };
+    return { minutes: 5 };
   }
 }
