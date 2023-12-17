@@ -1,11 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BaseProvideLoginUseCase } from './baseProviderLogin.usecase';
-import {
-  CustomError,
-  ForbiddenError,
-  Result,
-  UnauthorizedError,
-} from '../../../../core';
+import { ForbiddenError, Result, UnauthorizedError } from '../../../../core';
 import { ProviderUserResponse } from '../../response';
 import { Provider } from '@prisma/client';
 import { LoginProviderDto } from '../../dto';
@@ -96,7 +91,7 @@ export class GoogleLoginUseCase
       return Result.Ok<GoogleOauthToken>(data);
     } catch (err: any) {
       this.logger.log(err.response.data.error);
-      return Result.Err(new CustomError(ERROR_GOOGLE_OAUTH_TOKENS));
+      return Result.Err(new ForbiddenError(ERROR_GOOGLE_OAUTH_TOKENS));
     }
   }
 
@@ -116,7 +111,7 @@ export class GoogleLoginUseCase
       return Result.Ok<GoogleUserResult>(data);
     } catch (err) {
       this.logger.log(err);
-      return Result.Err(new CustomError(err.message));
+      return Result.Err(new ForbiddenError(err.message));
     }
   }
 }
