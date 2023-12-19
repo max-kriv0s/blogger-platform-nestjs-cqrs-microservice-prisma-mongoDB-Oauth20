@@ -10,7 +10,10 @@ import { APP_GLOBAL_PREFIX } from './config.constants';
 export function configApp(app: INestApplication) {
   app.setGlobalPrefix(APP_GLOBAL_PREFIX);
   app.use(cookieParser());
-  app.enableCors({ credentials: true });
+  app.enableCors({
+    credentials: true,
+    origin: ['http://localhost:3000', 'https://ft-inctagram.site/'],
+  });
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   pipesSetup(app);

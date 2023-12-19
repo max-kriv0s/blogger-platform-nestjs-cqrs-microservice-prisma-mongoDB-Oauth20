@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  Headers,
   HttpCode,
   HttpStatus,
   Ip,
@@ -23,9 +22,12 @@ import { ConfirmationCodeDto, GoogleLoginDto, LoginProviderDto } from '../dto';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNoContentResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ResponseUserDto } from '../../user/responses';
 import { BadRequestResponse } from '../../../core';
@@ -40,6 +42,7 @@ import { LogoutSwaggerDecorator } from '../../../core/swagger/auth/logout.swagge
 import { AuthService } from '../auth.service';
 import { PasswordRecoveryResendingDto } from '../../user/dto/passwordRecoveryResending.dto';
 import { LoginSwaggerDecorator } from '../../../core/swagger/auth/login.swagger.decorator';
+import { UserAgent } from '../../../core/decorators/userAgent.decorator';
 
 const baseUrl = '/auth';
 
@@ -170,7 +173,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Ip() ip: string,
-    @Headers('user-agent') title: string,
+    @UserAgent() title: string,
     @Res({ passthrough: true }) response: Response,
     @CurrentUserId() userId: string,
   ): Promise<ResponseAccessTokenDto> {
@@ -205,6 +208,10 @@ export class AuthController {
     return;
   }
 
+  @ApiOkResponse({ type: ResponseAccessTokenDto })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Get('google')
   @ApiOperation({
     summary: 'Oauth2 google authorization',
   })
@@ -212,7 +219,7 @@ export class AuthController {
   async googleLogin(
     @Query() { code }: GoogleLoginDto,
     @Ip() ip: string,
-    @Headers('user-agent') title: string,
+    @UserAgent() title: string,
     @Res({ passthrough: true }) response: Response,
   ): Promise<ResponseAccessTokenDto> {
     const providerDto: LoginProviderDto = {

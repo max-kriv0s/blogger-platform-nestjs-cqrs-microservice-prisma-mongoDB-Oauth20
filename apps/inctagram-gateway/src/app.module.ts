@@ -8,7 +8,13 @@ import { DeviceModule } from './features/device/device.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath:
+        process.env.NODE_ENV === 'development'
+          ? 'envs/.gateway.development.env'
+          : 'envs/.gateway.env',
+    }),
     PrismaModule,
     AuthModule,
     UserModule,
