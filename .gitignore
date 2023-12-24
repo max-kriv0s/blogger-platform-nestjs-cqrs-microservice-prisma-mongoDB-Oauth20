@@ -38,3 +38,5 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 .env
+.gateway.development.env
+.upload.files.development.env
