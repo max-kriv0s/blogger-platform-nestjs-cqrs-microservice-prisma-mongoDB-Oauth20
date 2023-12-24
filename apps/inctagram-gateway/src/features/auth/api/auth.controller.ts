@@ -2,27 +2,32 @@ import { Response } from 'express';
 import {
   Body,
   Controller,
-  Headers,
+  Get,
   HttpCode,
   HttpStatus,
   Ip,
   Post,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import {
   CreateUserDto,
   NewPasswordDto,
+  RegistrationEmailResendingDto,
   UserPasswordRecoveryDto,
 } from '../../user/dto';
-import { UserFasade } from '../../user/user.fasade';
-import { ConfirmationCodeDto } from '../dto';
+import { UserFacade } from '../../user/user.facade';
+import { ConfirmationCodeDto, GoogleLoginDto, LoginProviderDto } from '../dto';
 import {
   ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ResponseUserDto } from '../../user/responses';
 import { BadRequestResponse } from '../../../core';
@@ -34,6 +39,10 @@ import { ResponseAccessTokenDto } from '../../device/responses';
 import { CurrentDevice } from '../../../core/decorators/currentDevice.decorator';
 import { RefreshJwtGuard } from '../guards/refreshJwt.guard';
 import { LogoutSwaggerDecorator } from '../../../core/swagger/auth/logout.swagger.decorator';
+import { AuthService } from '../auth.service';
+import { PasswordRecoveryResendingDto } from '../../user/dto/passwordRecoveryResending.dto';
+import { LoginSwaggerDecorator } from '../../../core/swagger/auth/login.swagger.decorator';
+import { UserAgent } from '../../../core/decorators/userAgent.decorator';
 
 const baseUrl = '/auth';
 
@@ -42,30 +51,33 @@ export const endpoints = {
   registrationConfirmation: () => `${baseUrl}/registration-confirmation`,
   passwordRecovery: () => `${baseUrl}/password-recovery`,
   newPassword: () => `${baseUrl}/new-password`,
+  googleLogin: () => `${baseUrl}/google`,
+  gitHubLogin: () => `${baseUrl}/github`,
 };
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly userFasade: UserFasade,
+    private readonly userFacade: UserFacade,
     private readonly deviceFacade: DeviceFacade,
+    private readonly authService: AuthService,
   ) {}
 
   @ApiOperation({
     summary: 'User registration',
   })
-  @ApiOkResponse({ type: ResponseUserDto })
+  @ApiCreatedResponse({ type: ResponseUserDto })
   @ApiBadRequestResponse({ type: BadRequestResponse })
   @Post('registration')
   async createUser(@Body() userDto: CreateUserDto): Promise<ResponseUserDto> {
-    const resultCreated = await this.userFasade.useCases.createUser(userDto);
+    const resultCreated = await this.userFacade.useCases.createUser(userDto);
 
     if (!resultCreated.isSuccess) {
       throw resultCreated.err;
     }
 
-    const resultView = await this.userFasade.queries.getUserViewById(
+    const resultView = await this.userFacade.queries.getUserViewById(
       resultCreated.value.id,
     );
     if (!resultView.isSuccess) {
@@ -83,9 +95,26 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async confirmRegistration(@Body() confirmDto: ConfirmationCodeDto) {
     const confirmationResult =
-      await this.userFasade.useCases.confirmationRegistration(confirmDto);
+      await this.userFacade.useCases.confirmationRegistration(confirmDto);
     if (!confirmationResult.isSuccess) {
       throw confirmationResult.err;
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Resending confirmation code',
+  })
+  @ApiNoContentResponse()
+  @ApiBadRequestResponse({ type: BadRequestResponse })
+  @Post('registration-email-resending')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async resendingConfirmationCodeToUser(
+    @Body() resendingDto: RegistrationEmailResendingDto,
+  ) {
+    const resendingResult =
+      await this.userFacade.useCases.registrationEmailResending(resendingDto);
+    if (!resendingResult.isSuccess) {
+      throw resendingResult.err;
     }
   }
 
@@ -99,11 +128,28 @@ export class AuthController {
   async passwordRecovery(
     @Body() passwordRRecoveryDto: UserPasswordRecoveryDto,
   ) {
-    const recoveryResult = await this.userFasade.useCases.passwordRecovery(
+    const recoveryResult = await this.userFacade.useCases.passwordRecovery(
       passwordRRecoveryDto,
     );
     if (!recoveryResult.isSuccess) {
       throw recoveryResult.err;
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Resending password recovery code',
+  })
+  @ApiNoContentResponse()
+  @ApiBadRequestResponse({ type: BadRequestResponse })
+  @Post('password-recovery-resending')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async passwordRecoveryResending(
+    @Body() resendingDto: PasswordRecoveryResendingDto,
+  ) {
+    const resendingResult =
+      await this.userFacade.useCases.passwordRecoveryResending(resendingDto);
+    if (!resendingResult.isSuccess) {
+      throw resendingResult.err;
     }
   }
 
@@ -115,18 +161,19 @@ export class AuthController {
   @Post('new-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   async newPassword(@Body() dto: NewPasswordDto) {
-    const updateResult = await this.userFasade.useCases.newPassword(dto);
+    const updateResult = await this.authService.newPassword(dto);
     if (!updateResult.isSuccess) {
       throw updateResult.err;
     }
   }
 
   @Post('login')
+  @LoginSwaggerDecorator()
   @UseGuards(PasswordAuthGuard)
   @HttpCode(HttpStatus.OK)
   async login(
     @Ip() ip: string,
-    @Headers('user-agent') title: string,
+    @UserAgent() title: string,
     @Res({ passthrough: true }) response: Response,
     @CurrentUserId() userId: string,
   ): Promise<ResponseAccessTokenDto> {
@@ -160,4 +207,48 @@ export class AuthController {
     response.clearCookie('refreshToken');
     return;
   }
+
+  @ApiOkResponse({ type: ResponseAccessTokenDto })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Get('google')
+  @ApiOperation({
+    summary: 'Oauth2 google authorization',
+  })
+  @Get('google')
+  async googleLogin(
+    @Query() { code }: GoogleLoginDto,
+    @Ip() ip: string,
+    @UserAgent() title: string,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<ResponseAccessTokenDto> {
+    const providerDto: LoginProviderDto = {
+      code,
+      ip,
+      title,
+    };
+
+    const result = await this.authService.googleLogin(providerDto);
+
+    if (!result.isSuccess) {
+      throw result.err;
+    }
+
+    const { accessToken, refreshToken } = result.value;
+
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return new ResponseAccessTokenDto(accessToken);
+  }
+
+  // @Get('github')
+  // async gintHubLogin(
+  //   @Query() { code }: GitHubLoginDto,
+  //   @Ip() ip: string,
+  //   @Headers('user-agent') title: string,
+  //   @Res({ passthrough: true }) response: Response,
+  // ): Promise<ResponseAccessTokenDto> {}
 }

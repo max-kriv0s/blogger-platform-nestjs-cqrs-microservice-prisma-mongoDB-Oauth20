@@ -5,9 +5,11 @@ import {
   IsNotEmpty,
   IsString,
   Length,
+  Validate,
   validate,
 } from 'class-validator';
 import { BadRequestException } from '@nestjs/common';
+import { IsPasswordMustContain } from '../../user/decorators';
 
 export class LoginDto {
   constructor(email, password) {
@@ -24,6 +26,7 @@ export class LoginDto {
   email: string;
 
   @ApiProperty()
+  @Validate(IsPasswordMustContain)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @Length(6, 20)
   @IsString()
