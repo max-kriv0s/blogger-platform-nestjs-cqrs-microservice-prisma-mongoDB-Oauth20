@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtConfig } from '../../../core/jwt-adapter/jwt.config';
 import { AccessJwtPayloadType } from '../types/accessJwtPayload.type';
-import { UserFasade } from '../../user/user.fasade';
+import { UserFacade } from '../../user/user.facade';
 import { UserId } from '../../user/types';
 import { UnauthorizedError } from '../../../core';
 import { USER_NOT_FOUND } from '../../user/user.constants';
@@ -15,7 +15,7 @@ export class AccessTokenStrategy extends PassportStrategy(
 ) {
   constructor(
     private jwtConfig: JwtConfig,
-    private userFacade: UserFasade,
+    private userFacade: UserFacade,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -24,7 +24,7 @@ export class AccessTokenStrategy extends PassportStrategy(
   }
 
   async validate(payload: AccessJwtPayloadType): Promise<UserId> {
-    const user = await this.userFacade.queries.getUserViewById(payload.userId);
+    const user = await this.userFacade.repository.findUserById(payload.userId);
 
     if (!user) throw new UnauthorizedError(USER_NOT_FOUND);
 
