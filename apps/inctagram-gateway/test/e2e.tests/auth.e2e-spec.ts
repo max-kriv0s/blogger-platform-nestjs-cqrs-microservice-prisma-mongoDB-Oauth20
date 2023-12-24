@@ -39,7 +39,6 @@ describe('AuthController (e2e) test', () => {
     })
       .overrideProvider(EmailAdapter)
       .useValue(emailAdapterMock)
-
       .compile();
 
     app = await getAppForE2ETesting(testingModule);
