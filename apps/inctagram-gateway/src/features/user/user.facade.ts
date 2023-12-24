@@ -48,6 +48,7 @@ export class UserFacade {
       params: UpdateUserProviderByProviderIdParams,
       data: UpdateUserProviderByProviderIdData,
     ) => this.updateUserProviderByProviderId(params, data),
+    findUserById: (userId: string) => this.findUserById(userId),
   };
 
   useCases = {
@@ -144,11 +145,15 @@ export class UserFacade {
     );
   }
 
-  private passwordRecoveryResending(
+  private async passwordRecoveryResending(
     resendingDto: PasswordRecoveryResendingDto,
   ) {
     return this.commandBus.execute<PasswordRecoveryResendingCommand, Result>(
       new PasswordRecoveryResendingCommand(resendingDto),
     );
+  }
+
+  private async findUserById(userId: string) {
+    return this.userRepo.findById(userId);
   }
 }
