@@ -20,6 +20,11 @@ model User {
   userRegistrationInfo UserRegistrationInfo?
   devices Device[]
   providers UserProvider[]
+  firstName String? @map("first_name")
+  lastName String? @map("last_name")
+  dateOfBirth DateTime? @map("date_of_birth")
+  city String?
+  aboutMe String? @map("about_me")
 
   @@map("users")
 }
