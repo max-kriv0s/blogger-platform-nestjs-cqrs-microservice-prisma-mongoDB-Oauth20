@@ -3,11 +3,7 @@ import { UserService } from '../../user.service';
 import { UserRepository } from '../../db';
 import { UserId } from '../../types';
 import { Result, UnauthorizedError } from '../../../../core';
-import {
-  ERROR_PASSWORD_IS_WRONG,
-  ERROR_USER_NOT_CONFIRMED,
-  USER_NOT_FOUND,
-} from '../../user.constants';
+import { ERROR_USER_LOGIN } from '../../user.constants';
 import { LoginDto } from '../../../auth/dto/login.dto';
 
 export class CheckUserCredentialsCommand {
@@ -28,17 +24,16 @@ export class CheckUserCredentialsUseCase
   }: CheckUserCredentialsCommand): Promise<Result<UserId>> {
     const user = await this.userRepository.findByEmail(loginDto.email);
 
-    if (!user) return Result.Err(new UnauthorizedError(USER_NOT_FOUND));
+    if (!user) return Result.Err(new UnauthorizedError(ERROR_USER_LOGIN));
 
     const isMatched = this.userService.isCorrectPassword(
       loginDto.password,
       user.hashPassword,
     );
-    if (!isMatched)
-      return Result.Err(new UnauthorizedError(ERROR_PASSWORD_IS_WRONG));
+    if (!isMatched) return Result.Err(new UnauthorizedError(ERROR_USER_LOGIN));
 
     if (!user.userRegistrationInfo.isConfirmed)
-      return Result.Err(new UnauthorizedError(ERROR_USER_NOT_CONFIRMED));
+      return Result.Err(new UnauthorizedError(ERROR_USER_LOGIN));
 
     return Result.Ok({ userId: user.id });
   }
