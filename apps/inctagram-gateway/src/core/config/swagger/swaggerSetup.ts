@@ -9,6 +9,7 @@ export function swaggerSetup(app: INestApplication) {
     .setDescription('The intagram API description')
     .setVersion('1.0')
     .addTag('Intagram')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(`${APP_GLOBAL_PREFIX}/doc`, app, document);
