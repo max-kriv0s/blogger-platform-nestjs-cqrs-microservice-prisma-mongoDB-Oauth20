@@ -16,6 +16,22 @@ export class ResponseUserDto {
   @ApiProperty({ description: 'email', type: 'string' })
   email: string;
 
+  @ApiProperty({ description: 'First name', type: 'string' })
+  firstName: string;
+
+  @ApiProperty({ description: 'Last name', type: 'string' })
+  lastName: string;
+
+  @ApiProperty({
+    description: 'Date of birth',
+    type: 'string',
+    example: new Date().toISOString(),
+  })
+  dateOfBirth: string;
+
+  @ApiProperty({ description: 'City', type: 'string' })
+  city: string;
+
   @ApiProperty({
     description: 'creation date',
     type: 'string',
@@ -30,13 +46,24 @@ export class ResponseUserDto {
   })
   updatedAt: string;
 
+  @ApiProperty({
+    description: 'About me',
+    type: 'string',
+  })
+  aboutMe: string;
+
   static getView(user: User): ResponseUserDto {
     return {
       id: user.id,
       username: user.name,
       email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      dateOfBirth: user.dateOfBirth.toISOString(),
+      city: user.city,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
+      aboutMe: user.aboutMe,
     };
   }
 }
