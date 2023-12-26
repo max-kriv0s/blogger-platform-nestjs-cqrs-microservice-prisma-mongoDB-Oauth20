@@ -13,7 +13,12 @@ export const getAppForE2ETesting = async (testingModule: TestingModule) => {
   configApp(app);
   await app.init();
 
-  await truncateDBTables(app);
+  const developmentMode = process.env.NODE_ENV
+    ? process.env.NODE_ENV === 'development'
+    : false;
+  if (developmentMode) {
+    await truncateDBTables(app);
+  }
 
   return app;
 };
