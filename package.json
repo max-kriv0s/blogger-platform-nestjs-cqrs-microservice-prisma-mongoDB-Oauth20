@@ -10,7 +10,7 @@
     "build:inctagram-gateway": "nest build inctagram-gateway",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
-    "start:inctagram-gateway": "node dist/apps/inctagram-gateway/main",
+    "start:inctagram-gateway": "node dist/apps/inctagram-gateway/apps/inctagram-gateway/src/main",
     "start:dev": "nest start --watch",
     "start:dev:inctagram-gateway": "NODE_ENV=development nest start inctagram-gateway --watch",
     "start:dev:inctagram-upload-files": "NODE_ENV=development nest start inctagram-upload-files --watch",
