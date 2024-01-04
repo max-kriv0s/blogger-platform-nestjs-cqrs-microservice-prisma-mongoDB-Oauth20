@@ -66,8 +66,15 @@ describe('AuthController (e2e) test', () => {
         id: expect.any(String),
         username: userDto.username,
         email: userDto.email,
+        firstName: null,
+        lastName: null,
+        dateOfBirth: null,
+        country: null,
+        city: null,
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
+        aboutMe: null,
+        avatarUrl: null,
       };
 
       expect(body).toEqual(expectedBody);
