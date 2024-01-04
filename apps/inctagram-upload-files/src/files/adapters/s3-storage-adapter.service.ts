@@ -4,24 +4,29 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { ConfigService } from '@nestjs/config';
-import { AvatarUploadRequest, AvatarUploadResponse } from '@libs/contracts';
+import { AvatarUploadRequest } from '@libs/contracts';
+import { YandexCloudBacketConfig } from '../config/yandex-cloud-backet.configuration';
+import { FileSaveResponse } from '../types/fileSave.response';
 
 @Injectable()
 export class S3StorageAdapter {
   logger = new Logger(S3StorageAdapter.name);
 
-  s3Client: S3Client;
-  bucketName = this.configService.getOrThrow('BUCKET_NAME');
+  private s3Client: S3Client;
+  private bucketName: string;
+  private settings;
 
-  constructor(private readonly configService: ConfigService) {
-    const REGION = '';
+  constructor(private readonly yandexCloudConfig: YandexCloudBacketConfig) {
+    this.settings = yandexCloudConfig.getSettings();
+    this.bucketName = this.settings.YANDEX_CLOUD_BUCKET_NAME;
+
+    const REGION = 'ru-central1';
     this.s3Client = new S3Client({
       region: REGION,
-      endpoint: configService.getOrThrow('S3_ENDPOINT_URL'),
+      endpoint: this.settings.YANDEX_CLOUD_URL,
       credentials: {
-        secretAccessKey: configService.getOrThrow('S3_SECRET_ACCESS_KEY'),
-        accessKeyId: configService.getOrThrow('S3_ACCESS_KEY_ID'),
+        secretAccessKey: this.settings.YANDEX_CLOUD_SECRET_KEY,
+        accessKeyId: this.settings.YANDEX_CLOUD_KEY_ID,
       },
     });
   }
@@ -30,13 +35,14 @@ export class S3StorageAdapter {
     userId,
     originalname,
     buffer,
-  }: AvatarUploadRequest): Promise<AvatarUploadResponse> {
-    const key = `content/users/${userId}/avatars/${originalname}.png`;
+    format,
+  }: AvatarUploadRequest): Promise<FileSaveResponse> {
+    const key = `content/users/${userId}/avatars/${originalname}.${format}`;
     const bucketParams = {
       Bucket: this.bucketName,
       Key: key,
       Body: buffer,
-      ContentType: 'image/png',
+      ContentType: `image/${format}`,
     };
 
     const command = new PutObjectCommand(bucketParams);
@@ -54,8 +60,8 @@ export class S3StorageAdapter {
     }
   }
 
-  async deleteAvatar(fileId: string) {
-    const bucketParams = { Bucket: this.bucketName, Key: fileId };
+  async deleteAvatar(key: string) {
+    const bucketParams = { Bucket: this.bucketName, Key: key };
     try {
       const data = await this.s3Client.send(
         new DeleteObjectCommand(bucketParams),
@@ -65,5 +71,9 @@ export class S3StorageAdapter {
       this.logger.error(exception);
       throw exception;
     }
+  }
+
+  getUrlFile(url: string) {
+    return `${this.settings.YANDEX_CLOUD_URL_FILES}/${url}`;
   }
 }
