@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import add from 'date-fns/add';
@@ -14,6 +14,9 @@ import {
 } from './application';
 import { UserRepository } from './db';
 import { UserRegistrationInfo } from '@prisma/client';
+import { ClientProxy } from '@nestjs/microservices';
+import { FileUrlResponse } from '@libs/contracts';
+import { firstValueFrom, timeout } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -21,6 +24,7 @@ export class UserService {
     private readonly userRepo: UserRepository,
     private readonly userConfig: UserConfig,
     private readonly eventEmitter: EventEmitter2,
+    @Inject('FILE_SERVICE') private readonly fileServiceClient: ClientProxy,
   ) {}
 
   generatePasswordHash(password: string): string {
@@ -96,5 +100,14 @@ export class UserService {
     });
 
     this.createEventRecoveryPassword(email, dataCode.recoveryCode);
+  }
+
+  async getFileUrl(fileId: string): Promise<FileUrlResponse> {
+    const responseOfService = this.fileServiceClient
+      .send({ cmd: 'get_file_url' }, { fileId })
+      .pipe(timeout(10000));
+
+    const { url }: FileUrlResponse = await firstValueFrom(responseOfService);
+    return { url };
   }
 }
