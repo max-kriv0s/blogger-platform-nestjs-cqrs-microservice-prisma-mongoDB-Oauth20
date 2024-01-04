@@ -62,16 +62,6 @@ spec:
                  secretKeyRef:
                    name: inctagram-gateway-production-config-secret
                    key: TECH_EMAIL_SECURE
-             - name: FRONTEND_EMAIL_CONFIRMATION_URL
-               valueFrom:
-                 secretKeyRef:
-                   name: inctagram-gateway-production-config-secret
-                   key: FRONTEND_EMAIL_CONFIRMATION_URL
-             - name: FRONTEND_EMAIL_CONFIRMATION_PASSWORD_RECOVERY_URL
-               valueFrom:
-                 secretKeyRef:
-                   name: inctagram-gateway-production-config-secret
-                   key: FRONTEND_EMAIL_CONFIRMATION_PASSWORD_RECOVERY_URL
              - name: GOOGLE_OAUTH_REDIRECT
                valueFrom:
                  secretKeyRef:
@@ -97,6 +87,16 @@ spec:
                  secretKeyRef:
                    name: inctagram-gateway-production-config-secret
                    key: FRONTEND_EMAIL_CONFIRMATION_PASSWORD_RECOVERY_URL
+             - name: FILE_SERVICE_HOST
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-gateway-production-config-secret
+                   key: FILE_SERVICE_HOST
+             - name: FILE_SERVICE_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-gateway-production-config-secret
+                   key: FILE_SERVICE_PORT
              - name: DATABASE_URL
                valueFrom:
                  secretKeyRef:
