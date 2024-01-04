@@ -1,21 +1,22 @@
 import { applyDecorators } from '@nestjs/common';
 import {
   ApiOperation,
-  ApiOkResponse,
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
+  ApiNoContentResponse,
+  ApiBadGatewayResponse,
 } from '@nestjs/swagger';
-import { ResponseUserDto } from '@gateway/src/features/user/responses';
-import { NOT_FOUND } from '../swagger.constants';
 import { ApiErrorResponse } from '../../responses';
+import { NOT_FOUND } from '../swagger.constants';
 
-export function MeSwaggerDecorator() {
+export function DeleteUserAvatarSwaggerDecorator() {
   return applyDecorators(
     ApiUnauthorizedResponse({ type: ApiErrorResponse }),
     ApiOperation({
-      summary: 'User profiler',
+      summary: 'Delete user avatar',
     }),
-    ApiOkResponse({ type: ResponseUserDto }),
+    ApiNoContentResponse(),
     ApiNotFoundResponse({ type: ApiErrorResponse, description: NOT_FOUND }),
+    ApiBadGatewayResponse({ type: ApiErrorResponse }),
   );
 }
