@@ -11,18 +11,12 @@ import {
 } from './decorators';
 import { USER_USE_CASES } from './application';
 import { ClientsModule } from '@nestjs/microservices';
-import { UserController } from './user.controller';
+import { UserController } from './api/user.controller';
+import { getClientFileServiceConfig } from './config/clientFileService.config';
 
 @Module({
   imports: [
-    ClientsModule.register([
-      {
-        name: 'FILE_SERVICE',
-        options: {
-          port: 3000,
-        },
-      },
-    ]),
+    ClientsModule.registerAsync([getClientFileServiceConfig()]),
     CqrsModule,
     EventEmitterModule.forRoot(),
   ],
