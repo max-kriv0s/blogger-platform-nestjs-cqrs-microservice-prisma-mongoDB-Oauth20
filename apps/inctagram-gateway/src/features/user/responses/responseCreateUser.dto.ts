@@ -29,6 +29,9 @@ export class ResponseUserDto {
   })
   dateOfBirth: string;
 
+  @ApiProperty({ description: 'Country', type: 'string' })
+  country: string;
+
   @ApiProperty({ description: 'City', type: 'string' })
   city: string;
 
@@ -52,18 +55,26 @@ export class ResponseUserDto {
   })
   aboutMe: string;
 
-  static getView(user: User): ResponseUserDto {
+  @ApiProperty({
+    description: 'Avatar file url',
+    type: 'string',
+  })
+  avatarUrl: string;
+
+  static getView(user: User, avatarUrl?: string): ResponseUserDto {
     return {
       id: user.id,
       username: user.name,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      dateOfBirth: user.dateOfBirth.toISOString(),
+      dateOfBirth: user.dateOfBirth ? user.dateOfBirth.toISOString() : null,
+      country: user.country,
       city: user.city,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
       aboutMe: user.aboutMe,
+      avatarUrl: avatarUrl ? avatarUrl : null,
     };
   }
 }
