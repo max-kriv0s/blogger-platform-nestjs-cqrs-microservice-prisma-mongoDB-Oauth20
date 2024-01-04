@@ -4,9 +4,9 @@
     "json",
     "ts"
   ],
-  "rootDir": ".",
+  "rootDir": "../../",
   "testEnvironment": "node",
-  "testRegex": ".spec.ts$",
+  "testRegex": ".*\\.spec\\.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
@@ -15,7 +15,8 @@
     "node_modules"
   ],
   "moduleNameMapper": {
-    "^apps/inctagram-gateway/src/(.*)$": "<rootDir>/$1"
+    "^@gateway/(.*)$": "<rootDir>/$1",
+    "^@libs/(.*)$": ".<rootDir>/../../libs/$1"
   },
   "testTimeout": 15000
 }
