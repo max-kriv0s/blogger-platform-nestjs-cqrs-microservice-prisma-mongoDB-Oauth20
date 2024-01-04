@@ -10,9 +10,16 @@ import {
   IsPasswordsMatchingConstraint,
 } from './decorators';
 import { USER_USE_CASES } from './application';
+import { ClientsModule } from '@nestjs/microservices';
+import { UserController } from './api/user.controller';
+import { getClientFileServiceConfig } from './config/clientFileService.config';
 
 @Module({
-  imports: [CqrsModule, EventEmitterModule.forRoot()],
+  imports: [
+    ClientsModule.registerAsync([getClientFileServiceConfig()]),
+    CqrsModule,
+    EventEmitterModule.forRoot(),
+  ],
   providers: [
     UserConfig,
     ...USER_USE_CASES,
@@ -24,5 +31,6 @@ import { USER_USE_CASES } from './application';
     IsPasswordMustContain,
   ],
   exports: [UserFacade],
+  controllers: [UserController],
 })
 export class UserModule {}

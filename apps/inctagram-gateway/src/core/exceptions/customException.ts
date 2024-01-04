@@ -62,3 +62,9 @@ export class InternalServerError extends CustomError {
     super(msg, ExceptionCodes.InternalServerError);
   }
 }
+
+export class BadGatewayError extends CustomError {
+  constructor(msg: string) {
+    super(msg, ExceptionCodes.BadGateway);
+  }
+}

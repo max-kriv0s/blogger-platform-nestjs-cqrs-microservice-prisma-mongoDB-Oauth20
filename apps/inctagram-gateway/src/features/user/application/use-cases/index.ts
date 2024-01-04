@@ -8,6 +8,9 @@ import { CheckUserCredentialsUseCase } from './checkUserCredentials';
 import { LinkProviderUserToExistingUserUseCase } from './linkProviderUserToExistingUser.usecase';
 import { RegistrationEmailResendingUseCase } from './registrationEmailResending.usecase';
 import { PasswordRecoveryResendingUseCase } from './passwordRecoveryResending.usecase';
+import { UploadAvatarUserUseCase } from './uploadAvatarUser.usecase';
+import { UpdateUserUseCase } from './updateUser.usercase';
+import { DeleteAvatarUserUseCase } from './deleteAvatarUser.usecase';
 
 export * from './createUser.usecase';
 export * from './confirmationRegistration.usecase';
@@ -17,6 +20,9 @@ export * from './checkUserCredentials';
 export * from './linkProviderUserToExistingUser.usecase';
 export * from './registrationEmailResending.usecase';
 export * from './passwordRecoveryResending.usecase';
+export * from './uploadAvatarUser.usecase';
+export * from './updateUser.usercase';
+export * from './deleteAvatarUser.usecase';
 
 export const USER_USE_CASES: Type<ICommandHandler>[] = [
   CreateUserUseCase,
@@ -27,4 +33,7 @@ export const USER_USE_CASES: Type<ICommandHandler>[] = [
   LinkProviderUserToExistingUserUseCase,
   RegistrationEmailResendingUseCase,
   PasswordRecoveryResendingUseCase,
+  UploadAvatarUserUseCase,
+  UpdateUserUseCase,
+  DeleteAvatarUserUseCase,
 ];

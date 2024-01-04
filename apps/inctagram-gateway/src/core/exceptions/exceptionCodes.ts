@@ -4,4 +4,5 @@ export enum ExceptionCodes {
   Forbidden = 403,
   NotFound = 404,
   InternalServerError = 500,
+  BadGateway = 502,
 }

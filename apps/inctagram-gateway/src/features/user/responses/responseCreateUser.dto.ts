@@ -16,6 +16,26 @@ export class ResponseUserDto {
   @ApiProperty({ description: 'email', type: 'string' })
   email: string;
 
+  @ApiProperty({ description: 'First name', type: 'string', nullable: true })
+  firstName: string;
+
+  @ApiProperty({ description: 'Last name', type: 'string', nullable: true })
+  lastName: string;
+
+  @ApiProperty({
+    description: 'Date of birth',
+    type: 'string',
+    example: new Date().toISOString(),
+    nullable: true,
+  })
+  dateOfBirth: string;
+
+  @ApiProperty({ description: 'Country', type: 'string', nullable: true })
+  country: string;
+
+  @ApiProperty({ description: 'City', type: 'string', nullable: true })
+  city: string;
+
   @ApiProperty({
     description: 'creation date',
     type: 'string',
@@ -30,13 +50,34 @@ export class ResponseUserDto {
   })
   updatedAt: string;
 
-  static getView(user: User): ResponseUserDto {
+  @ApiProperty({
+    description: 'About me',
+    type: 'string',
+    nullable: true,
+  })
+  aboutMe: string;
+
+  @ApiProperty({
+    description: 'Avatar file url',
+    type: 'string',
+    nullable: true,
+  })
+  avatarUrl: string;
+
+  static getView(user: User, avatarUrl?: string): ResponseUserDto {
     return {
       id: user.id,
       username: user.name,
       email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      dateOfBirth: user.dateOfBirth ? user.dateOfBirth.toISOString() : null,
+      country: user.country,
+      city: user.city,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
+      aboutMe: user.aboutMe,
+      avatarUrl: avatarUrl ? avatarUrl : null,
     };
   }
 }

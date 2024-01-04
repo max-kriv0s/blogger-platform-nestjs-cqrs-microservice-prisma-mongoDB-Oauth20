@@ -1,12 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/prisma/prisma.servise';
 import { ResponseUserDto } from '../responses';
-import { NotFoundError, Result } from '../../../core';
-import { USER_NOT_FOUND } from '../user.constants';
+import { BadGatewayError, NotFoundError, Result } from '../../../core';
+import { ERROR_FILE_NOT_FOUND, USER_NOT_FOUND } from '../user.constants';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom, timeout } from 'rxjs';
+import { FileUrlResponse } from '@libs/contracts';
 
 @Injectable()
 export class UserQueryRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    @Inject('FILE_SERVICE') private readonly fileServiceClient: ClientProxy,
+  ) {}
 
   async getUserViewById(id: string): Promise<Result<ResponseUserDto>> {
     const user = await this.prismaService.user.findUnique({
@@ -15,6 +21,21 @@ export class UserQueryRepository {
     if (!user) {
       return Result.Err(new NotFoundError(USER_NOT_FOUND));
     }
-    return Result.Ok(ResponseUserDto.getView(user));
+
+    if (!user.avatarId) {
+      return Result.Ok(ResponseUserDto.getView(user));
+    }
+
+    try {
+      const responseOfService = this.fileServiceClient
+        .send({ cmd: 'get_file_url' }, { fileId: user.avatarId })
+        .pipe(timeout(10000));
+      const avatarUrl: FileUrlResponse = await firstValueFrom(
+        responseOfService,
+      );
+      return Result.Ok(ResponseUserDto.getView(user, avatarUrl.url));
+    } catch (error) {
+      return Result.Err(new BadGatewayError(ERROR_FILE_NOT_FOUND));
+    }
   }
 }
