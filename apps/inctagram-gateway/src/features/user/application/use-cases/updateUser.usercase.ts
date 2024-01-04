@@ -1,10 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateUserDto } from '../../dto';
-import {
-  BadRequestError,
-  NotFoundError,
-  Result,
-} from 'apps/inctagram-gateway/src/core';
+import { BadRequestError, NotFoundError, Result } from '@gateway/src/core';
 import { UserRepository } from '../../db';
 import {
   ERROR_LESS_THAN_13_YEARS_OLD,
