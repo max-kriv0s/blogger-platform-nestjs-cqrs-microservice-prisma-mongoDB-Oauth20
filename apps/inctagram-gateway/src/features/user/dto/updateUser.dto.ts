@@ -36,6 +36,7 @@ export class UpdateUserDto {
     minLength: 1,
     maxLength: 50,
     pattern: 'A-Z; a-z; А-Я ; а-я',
+    required: false,
   })
   @Matches('^[a-zA-ZА-Яа-я]*$')
   @Length(1, 50, { message: ERROR_LENGTH_FIRST_NAME })
@@ -50,6 +51,7 @@ export class UpdateUserDto {
     minLength: 1,
     maxLength: 50,
     pattern: 'A-Z; a-z; А-Я ; а-я',
+    required: false,
   })
   @Matches('^[a-zA-ZА-Яа-я]*$')
   @Length(1, 50, { message: ERROR_LENGTH_LAST_NAME })
@@ -61,6 +63,7 @@ export class UpdateUserDto {
     description: 'Date of birth',
     type: 'date',
     example: '2023-12-25T00:00:00.000Z',
+    required: false,
   })
   @IsDate()
   @IsOptional()
@@ -70,6 +73,7 @@ export class UpdateUserDto {
     description: 'Country',
     type: 'string',
     example: 'Russia',
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -79,6 +83,7 @@ export class UpdateUserDto {
     description: 'City',
     type: 'string',
     example: 'Moscow',
+    required: false,
   })
   @IsString()
   @IsOptional()
@@ -90,6 +95,7 @@ export class UpdateUserDto {
     example: 'backend developer',
     minLength: 0,
     maxLength: 200,
+    required: false,
   })
   @Length(0, 200, { message: ERROR_LENGTH_ABOUT_ME })
   @IsString()
