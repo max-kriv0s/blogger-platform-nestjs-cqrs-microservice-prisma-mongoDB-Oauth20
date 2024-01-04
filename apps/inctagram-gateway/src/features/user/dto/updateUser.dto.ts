@@ -36,7 +36,6 @@ export class UpdateUserDto {
     minLength: 1,
     maxLength: 50,
     pattern: 'A-Z; a-z; А-Я ; а-я',
-    required: false,
   })
   @Matches('^[a-zA-ZА-Яа-я]*$')
   @Length(1, 50, { message: ERROR_LENGTH_FIRST_NAME })
@@ -51,7 +50,6 @@ export class UpdateUserDto {
     minLength: 1,
     maxLength: 50,
     pattern: 'A-Z; a-z; А-Я ; а-я',
-    required: false,
   })
   @Matches('^[a-zA-ZА-Яа-я]*$')
   @Length(1, 50, { message: ERROR_LENGTH_LAST_NAME })
