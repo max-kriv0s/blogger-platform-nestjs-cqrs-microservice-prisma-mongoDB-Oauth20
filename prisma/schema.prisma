@@ -23,8 +23,10 @@ model User {
   firstName String? @map("first_name")
   lastName String? @map("last_name")
   dateOfBirth DateTime? @map("date_of_birth")
+  country String?
   city String?
   aboutMe String? @map("about_me")
+  avatarId String? @map("avatar_id")
 
   @@map("users")
 }
