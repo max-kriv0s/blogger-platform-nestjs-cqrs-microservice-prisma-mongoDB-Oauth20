@@ -11,7 +11,7 @@ import {
 } from '../../user.constants';
 import sharp from 'sharp';
 
-import { Observable, firstValueFrom, timeout } from 'rxjs';
+import { firstValueFrom, timeout } from 'rxjs';
 import {
   BadGatewayError,
   BadRequestError,

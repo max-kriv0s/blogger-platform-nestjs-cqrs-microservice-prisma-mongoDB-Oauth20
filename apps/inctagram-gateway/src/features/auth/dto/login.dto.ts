@@ -42,7 +42,6 @@ export class LoginDto {
           field: e.property,
         })),
       );
-    console.log('validate login dto errors:', errors);
     return;
   }
 }

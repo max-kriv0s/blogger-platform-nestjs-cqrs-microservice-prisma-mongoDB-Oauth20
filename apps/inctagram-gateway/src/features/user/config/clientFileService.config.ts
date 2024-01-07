@@ -7,7 +7,7 @@ export const getClientFileServiceConfig = (): ClientsProviderAsyncOptions => {
       transport: Transport.TCP,
       options: {
         host: configService.get('FILE_SERVICE_HOST'),
-        port: configService.get<number>('FILE_SERVICE_PORT'),
+        port: Number(configService.get('FILE_SERVICE_PORT')),
       },
     }),
     inject: [ConfigService],
