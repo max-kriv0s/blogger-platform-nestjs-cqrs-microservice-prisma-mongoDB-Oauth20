@@ -42,6 +42,11 @@ spec:
                  secretKeyRef:
                    name: inctagram-upload-files-production-config-secret
                    key: YANDEX_CLOUD_URL_FILES
+             - name: MONGO_URI
+               valueFrom:
+                 secretKeyRef:
+                   name: inctagram-upload-files-production-config-secret
+                   key: MONGO_URI
              - name: YANDEX_CLOUD_BUCKET_NAME
                valueFrom:
                  secretKeyRef:
