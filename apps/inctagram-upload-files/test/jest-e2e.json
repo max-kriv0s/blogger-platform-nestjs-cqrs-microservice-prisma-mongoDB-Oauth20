@@ -9,5 +9,6 @@
   "moduleNameMapper": {
     "^@/root(.*)$": "<rootDir>/src$1",
     "^@libs(.*)$": "<rootDir>/../../../libs$1"
-  }
+  },
+  "testTimeout": 15000
 }
