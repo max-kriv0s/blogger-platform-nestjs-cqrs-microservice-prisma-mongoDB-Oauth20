@@ -14,8 +14,8 @@ describe('InctagramUploadFilesController (e2e)', () => {
     app = await moduleFixture.createNestMicroservice({
       transport: Transport.TCP,
       options: {
-        host: process.env.FILE_SERVICE_HOST || '0.0.0.0',
-        port: Number(process.env.FILE_SERVICE_PORT || '3196'),
+        host: '0.0.0.0',
+        port: 3196,
       },
     });
     await app.listen();
