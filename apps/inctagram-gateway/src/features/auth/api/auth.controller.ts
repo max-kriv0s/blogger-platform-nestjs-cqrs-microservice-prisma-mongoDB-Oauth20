@@ -184,7 +184,7 @@ export class AuthController {
 
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      // secure: true,
+      secure: true,
       sameSite: 'none',
     });
 
