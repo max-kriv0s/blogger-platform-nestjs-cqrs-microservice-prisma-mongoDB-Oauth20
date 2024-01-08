@@ -13,6 +13,8 @@ export function configApp(app: INestApplication) {
   app.enableCors({
     credentials: true,
     origin: ['http://localhost:3000', 'https://ft-inctagram.site/'],
+    methods: 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
+    allowedHeaders: ['Accept', 'Content-Type', 'Authorization'],
   });
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
