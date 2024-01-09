@@ -6,7 +6,7 @@ export const getClientFileServiceConfig = (): ClientsProviderAsyncOptions => {
     useFactory: (configService: ConfigService) => ({
       transport: Transport.TCP,
       options: {
-        host: 'inctagram-upload-files-service',
+        host: configService.getOrThrow('FILE_SERVICE_HOST'),
         port: 3196,
       },
     }),
