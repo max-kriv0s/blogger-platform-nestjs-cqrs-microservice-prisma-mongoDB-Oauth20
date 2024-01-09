@@ -6,7 +6,7 @@ export const getClientFileServiceConfig = (): ClientsProviderAsyncOptions => {
     useFactory: (configService: ConfigService) => ({
       transport: Transport.TCP,
       options: {
-        host: configService.getOrThrow('FILE_SERVICE_HOST'),
+        host: configService.get('FILE_SERVICE_HOST'),
         port: 3196,
       },
     }),
