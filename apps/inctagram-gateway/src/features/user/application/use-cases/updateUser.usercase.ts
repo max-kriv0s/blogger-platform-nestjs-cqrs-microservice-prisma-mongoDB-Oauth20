@@ -11,7 +11,7 @@ import add from 'date-fns/add';
 
 export class UpdateUserCommand {
   constructor(
-    public id: string,
+    public userId: string,
     public updateDto: UpdateUserDto,
   ) {}
 }
@@ -20,7 +20,7 @@ export class UpdateUserCommand {
 export class UpdateUserUseCase implements ICommandHandler {
   constructor(private readonly userRepo: UserRepository) {}
 
-  async execute({ id, updateDto }: UpdateUserCommand): Promise<Result> {
+  async execute({ userId, updateDto }: UpdateUserCommand): Promise<Result> {
     const thirteenYears = add(updateDto.dateOfBirth, { years: 13 });
     if (thirteenYears > new Date()) {
       return Result.Err(
@@ -28,18 +28,24 @@ export class UpdateUserUseCase implements ICommandHandler {
       );
     }
 
-    const userByLogin = this.userRepo.findByUsernameOrEmail(updateDto.username);
-    if (userByLogin) {
+    const userByLogin = await this.userRepo.findByUsernameOrEmail(
+      updateDto.username,
+    );
+    if (userByLogin && userByLogin.id !== userId) {
       return Result.Err(
         new BadRequestError(ERROR_USERNAME_IS_ALREADY_REGISTRED, 'username'),
       );
     }
 
-    const user = await this.userRepo.findById(id);
+    const user = await this.userRepo.findById(userId);
     if (!user) {
       return Result.Err(new NotFoundError(USER_NOT_FOUND));
     }
-    await this.userRepo.update(id, updateDto);
+
+    const data = { ...updateDto, name: updateDto.username };
+    delete data.username;
+
+    await this.userRepo.update(userId, data);
     return Result.Ok();
   }
 }
