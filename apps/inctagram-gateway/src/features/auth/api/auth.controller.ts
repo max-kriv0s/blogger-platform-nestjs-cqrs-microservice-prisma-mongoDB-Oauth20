@@ -8,6 +8,7 @@ import {
   Ip,
   Post,
   Query,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -30,7 +31,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ResponseUserDto } from '../../user/responses';
-import { BadRequestResponse } from '../../../core';
+import { BadRequestResponse, CustomError, Result } from '../../../core';
 import { DeviceFacade } from '../../device/device.facade';
 import { PasswordAuthGuard } from '../guards/password.guard';
 import { CurrentUserId } from '../../../core/decorators/currentUserId.decorator';
@@ -52,6 +53,8 @@ export const endpoints = {
   passwordRecovery: () => `${baseUrl}/password-recovery`,
   newPassword: () => `${baseUrl}/new-password`,
   googleLogin: () => `${baseUrl}/google`,
+  login: () => `${baseUrl}/login`,
+  newRefreshToken: () => `${baseUrl}/refresh-token`,
   gitHubLogin: () => `${baseUrl}/github`,
 };
 
@@ -188,6 +191,42 @@ export class AuthController {
       sameSite: 'none',
     });
 
+    return new ResponseAccessTokenDto(accessToken);
+  }
+
+  @Post('refresh-token')
+  @UseGuards(RefreshJwtGuard)
+  async newRefreshToken(
+    @Req() request: any,
+    @Ip() ip: string,
+    @UserAgent() title: string,
+    @Res({ passthrough: true }) response: Response,
+    @CurrentUserId() userId: string,
+  ): Promise<ResponseAccessTokenDto | CustomError> {
+    const payload = request.user.devicePayload;
+
+    //console.log(payload);
+
+    const isDeleted: Result =
+      await this.deviceFacade.useCases.deleteDeviceByIdAndUserId(
+        payload.userId,
+        payload.deviceId,
+      );
+
+    if (isDeleted !== Result.Ok()) {
+      return isDeleted.err;
+    }
+
+    const result = await this.deviceFacade.useCases.createDevice(
+      new DeviceDto(ip, title, userId),
+    );
+    const { accessToken, refreshToken } = result.value;
+
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
     return new ResponseAccessTokenDto(accessToken);
   }
 

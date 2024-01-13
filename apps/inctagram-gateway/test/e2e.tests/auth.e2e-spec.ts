@@ -253,4 +253,30 @@ describe('AuthController (e2e) test', () => {
       expect(callWithCurrentEmail.length).toBe(2);
     });
   });
+
+  // describe('Getting new refresh token', () => {
+  //   it(`${endpoints.newRefreshToken} (POST) Getting new refresh token`, async () => {
+  //     const userDto = authTestHelper.userDto();
+  //
+  //     await authTestHelper.registrationUser(userDto);
+  //     await new Promise((pause) => setTimeout(pause, 100));
+  //
+  //     // expect(emailAdapterMock.sendEmail).toHaveBeenCalled();
+  //     const mock = emailAdapterMock.sendEmail.mock;
+  //     const lastMockCall = mock.calls.length - 1;
+  //     // expect(mock.calls[lastMockCall][0]).toBe(userDto.email);
+  //     //
+  //     const message = mock.calls[lastMockCall][2];
+  //     const codeConfirmation = findUUIDv4(message);
+  //
+  //     // expect(codeConfirmation.length).not.toBe(0);
+  //
+  //     await authTestHelper.confirmRegistration({ code: codeConfirmation });
+  //
+  //     await authTestHelper.login({
+  //       email: userDto.email,
+  //       password: userDto.password,
+  //     });
+  //   });
+  // });
 });
