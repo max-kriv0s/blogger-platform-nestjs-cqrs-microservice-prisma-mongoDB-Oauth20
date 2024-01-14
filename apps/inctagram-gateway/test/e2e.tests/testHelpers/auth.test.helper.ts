@@ -78,4 +78,20 @@ export class AuthTestHelper {
       .send(dto)
       .expect(expectedCode);
   }
+
+  async login(
+    email: string,
+    password: string,
+    config: {
+      expectedCode?: number;
+    } = {},
+  ) {
+    const expectedCode = config.expectedCode ?? HttpStatus.OK;
+
+    return request(this.app.getHttpServer())
+      .post(this.globalPrefix + endpoints.login())
+      .set('User-Agent', 'test')
+      .send({ email, password })
+      .expect(expectedCode);
+  }
 }

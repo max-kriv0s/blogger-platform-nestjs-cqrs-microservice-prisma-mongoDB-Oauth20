@@ -36,7 +36,7 @@ import { UploadUserAvatarSwaggerDecorator } from '@gateway/src/core/swagger/user
 
 const baseUrl = '/user';
 export const endpoints = {
-  me: () => `${baseUrl}`,
+  me: () => `${baseUrl}/me`,
   updateUser: () => `${baseUrl}`,
 };
 
