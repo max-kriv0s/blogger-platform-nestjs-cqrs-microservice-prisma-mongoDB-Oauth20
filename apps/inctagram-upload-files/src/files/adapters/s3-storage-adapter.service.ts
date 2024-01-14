@@ -37,7 +37,7 @@ export class S3StorageAdapter {
     buffer,
     format,
   }: AvatarUploadRequest): Promise<FileSaveResponse> {
-    const key = `content/users/${userId}/avatars/${originalname}.${format}`;
+    const key = `content/users/${userId}/avatars/${originalname}`;
     const bucketParams = {
       Bucket: this.bucketName,
       Key: key,
