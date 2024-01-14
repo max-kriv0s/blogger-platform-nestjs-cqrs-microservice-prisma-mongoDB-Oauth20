@@ -13,6 +13,7 @@ import {
   ERROR_LENGTH_LAST_NAME,
   ERROR_LENGTH_USERNAME,
 } from '../user.constants';
+import { Type } from 'class-transformer';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -64,6 +65,7 @@ export class UpdateUserDto {
     required: false,
   })
   @IsDate()
+  @Type(() => Date)
   @IsOptional()
   dateOfBirth: Date;
 
