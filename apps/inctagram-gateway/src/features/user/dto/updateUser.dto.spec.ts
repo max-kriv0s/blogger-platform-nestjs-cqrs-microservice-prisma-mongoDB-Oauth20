@@ -108,7 +108,7 @@ describe('UpdateUserDto', () => {
   });
 
   it('dateOfBirth incorrect value', async () => {
-    correctInputData.dateOfBirth = 1;
+    correctInputData.dateOfBirth = 's';
     const updateUserDto = plainToInstance(UpdateUserDto, correctInputData);
     const errors = await validate(updateUserDto);
     expect(errors.length).toBe(1);
