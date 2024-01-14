@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../core/prisma/prisma.servise';
 import { ResponseUserDto } from '../responses';
 import { BadGatewayError, NotFoundError, Result } from '../../../core';
@@ -9,6 +9,8 @@ import { FileUrlResponse } from '@libs/contracts';
 
 @Injectable()
 export class UserQueryRepository {
+  private logger = new Logger(UserQueryRepository.name);
+
   constructor(
     private readonly prismaService: PrismaService,
     @Inject('FILE_SERVICE') private readonly fileServiceClient: ClientProxy,
@@ -35,7 +37,8 @@ export class UserQueryRepository {
       );
       return Result.Ok(ResponseUserDto.getView(user, avatarUrl.url));
     } catch (error) {
-      return Result.Err(new BadGatewayError(ERROR_FILE_NOT_FOUND));
+      this.logger.log(`userId: ${id} - ${error}`);
+      return Result.Ok(ResponseUserDto.getView(user));
     }
   }
 }

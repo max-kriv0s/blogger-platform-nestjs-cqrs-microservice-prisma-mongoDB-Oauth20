@@ -53,6 +53,7 @@ export const endpoints = {
   newPassword: () => `${baseUrl}/new-password`,
   googleLogin: () => `${baseUrl}/google`,
   gitHubLogin: () => `${baseUrl}/github`,
+  login: () => `${baseUrl}/login`,
 };
 
 @ApiTags('Auth')
