@@ -87,16 +87,6 @@ spec:
                  secretKeyRef:
                    name: inctagram-gateway-production-config-secret
                    key: FRONTEND_EMAIL_CONFIRMATION_PASSWORD_RECOVERY_URL
-             - name: FILE_SERVICE_HOST
-               valueFrom:
-                 secretKeyRef:
-                   name: inctagram-gateway-production-config-secret
-                   key: FILE_SERVICE_HOST
-             - name: FILE_SERVICE_PORT
-               valueFrom:
-                 secretKeyRef:
-                   name: inctagram-gateway-production-config-secret
-                   key: FILE_SERVICE_PORT
              - name: DATABASE_URL
                valueFrom:
                  secretKeyRef:
