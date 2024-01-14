@@ -203,9 +203,9 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
     @CurrentUserId() userId: string,
   ): Promise<ResponseAccessTokenDto | CustomError> {
-    const payload = request.user.devicePayload;
+    const payload = request.user;
 
-    //console.log(payload);
+    //console.log('payload', request);
 
     const isDeleted: Result =
       await this.deviceFacade.useCases.deleteDeviceByIdAndUserId(
@@ -213,7 +213,8 @@ export class AuthController {
         payload.deviceId,
       );
 
-    if (isDeleted !== Result.Ok()) {
+    if (!isDeleted.isSuccess) {
+      console.log('gets errror');
       return isDeleted.err;
     }
 

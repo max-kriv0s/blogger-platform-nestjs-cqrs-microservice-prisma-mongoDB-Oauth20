@@ -54,6 +54,7 @@ export class AuthTestHelper {
 
   async login(
     loginDto: LoginDto,
+    deviceName,
     config: {
       expectedCode?: number;
     } = {},
@@ -63,6 +64,24 @@ export class AuthTestHelper {
     return request(this.app.getHttpServer())
       .post(this.globalPrefix + endpoints.login())
       .send(loginDto)
+      .set('user-agent', deviceName)
+      .expect(expectedCode);
+  }
+
+  async newRefreshToken(
+    refreshToken,
+    deviceName,
+    config: {
+      expectedCode?: number;
+    } = {},
+  ) {
+    const expectedCode = config.expectedCode ?? HttpStatus.NO_CONTENT;
+
+    return request(this.app.getHttpServer())
+      .post(this.globalPrefix + endpoints.newRefreshToken())
+      .send()
+      .set('Cookie', `${refreshToken}`)
+      .set('user-agent', deviceName)
       .expect(expectedCode);
   }
 
