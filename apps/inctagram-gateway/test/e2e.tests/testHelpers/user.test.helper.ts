@@ -54,7 +54,7 @@ export class UserTestHelper {
     return request(this.app.getHttpServer())
       .put(this.globalPrefix + endpoints.updateUser())
       .set('Authorization', `Bearer ${accessToken}`)
-      .send(updateDto);
-    // .expect(expectedCode);
+      .send(updateDto)
+      .expect(expectedCode);
   }
 }
