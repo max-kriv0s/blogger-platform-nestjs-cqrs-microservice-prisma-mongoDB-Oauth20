@@ -123,7 +123,8 @@
     ],
     "moduleNameMapper": {
       "^@gateway/(.*)$": "<rootDir>/apps/inctagram-gateway/$1",
-      "^@libs/(.*)$": ".<rootDir>/../../libs/$1"
+      "^@libs/(.*)$": ".<rootDir>/../../libs/$1",
+      "^@fileService/(.*)$": "<rootDir>/apps/inctagram-upload-files/$1"
     },
     "testTimeout": 15000
   }

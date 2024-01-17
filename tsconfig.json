@@ -22,6 +22,7 @@
       // "src/*": ["./src/*"],
       "@libs/*": ["libs/*"],
       "@gateway/*": ["apps/inctagram-gateway/*"],
+      "@fileService/*": ["apps/inctagram-upload-files/*"],
 
       // "@src": [
       //   "apps/inctagram-gateway/src/"
