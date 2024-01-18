@@ -205,22 +205,26 @@ export class AuthController {
   ): Promise<ResponseAccessTokenDto | CustomError> {
     const payload = request.user;
 
-    //console.log('payload', request);
-
-    const isDeleted: Result =
-      await this.deviceFacade.useCases.deleteDeviceByIdAndUserId(
-        payload.userId,
-        payload.deviceId,
-      );
-
-    if (!isDeleted.isSuccess) {
-      console.log('gets errror');
-      return isDeleted.err;
-    }
-
-    const result = await this.deviceFacade.useCases.createDevice(
-      new DeviceDto(ip, title, userId),
+    const result = await this.deviceFacade.useCases.refreshToken(
+      ip,
+      title,
+      userId,
+      payload.deviceId,
     );
+
+    // const isDeleted: Result =
+    //   await this.deviceFacade.useCases.deleteDeviceByIdAndUserId(
+    //     payload.userId,
+    //     payload.deviceId,
+    //   );
+    //
+    // if (!isDeleted.isSuccess) {
+    //   throw isDeleted.err;
+    // }
+    //
+    // const result = await this.deviceFacade.useCases.createDevice(
+    //   new DeviceDto(ip, title, userId),
+    // );
     const { accessToken, refreshToken } = result.value;
 
     response.cookie('refreshToken', refreshToken, {

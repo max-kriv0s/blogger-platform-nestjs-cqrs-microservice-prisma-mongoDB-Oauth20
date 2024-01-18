@@ -266,15 +266,11 @@ describe('AuthController (e2e) test', () => {
       await authTestHelper.registrationUser(userDto);
       await new Promise((pause) => setTimeout(pause, 100));
 
-      // expect(emailAdapterMock.sendEmail).toHaveBeenCalled();
       const mock = emailAdapterMock.sendEmail.mock;
       const lastMockCall = mock.calls.length - 1;
-      // expect(mock.calls[lastMockCall][0]).toBe(userDto.email);
-      //
+
       const message = mock.calls[lastMockCall][2];
       const codeConfirmation = findUUIDv4(message);
-
-      // expect(codeConfirmation.length).not.toBe(0);
 
       await authTestHelper.confirmRegistration({ code: codeConfirmation });
 
@@ -306,7 +302,6 @@ describe('AuthController (e2e) test', () => {
       );
 
       expect(tokenPairs.body.message).toEqual('Device not found');
-      //console.log(tokenPairs.body);
     });
   });
 });

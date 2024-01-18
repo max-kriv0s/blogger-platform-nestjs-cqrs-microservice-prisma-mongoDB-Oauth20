@@ -11,17 +11,25 @@ import { CreateTokensType } from './types/createTokens.type';
 import { DeviceInfo } from './types/deviceInfo.type';
 import { UserId } from '../user/types';
 import { DeviceRepository } from './db';
+import { RefreshTokenCommand } from '@gateway/src/features/device/application/use-cases/refreshToken.usecase';
 
 @Injectable()
 export class DeviceFacade {
   constructor(
-    private readonly commandBus: CommandBus, // private readonly deviceQueryRepo: DeviceQueryRepository,
+    private readonly commandBus: CommandBus,
     private readonly deviceRepo: DeviceRepository,
   ) {}
 
   useCases = {
     createDevice: (deviceDto: DeviceDto): Promise<Result<CreateTokensType>> =>
       this.createDevice(deviceDto),
+
+    refreshToken: (
+      ip: string,
+      title: string,
+      userId: string,
+      deviceId: string,
+    ) => this.refreshToken(ip, title, userId, deviceId),
 
     checkDeviceCredentials: (
       devicePayload: DeviceInfo & UserId,
@@ -45,6 +53,17 @@ export class DeviceFacade {
       CreateDeviceCommand,
       Result<CreateTokensType>
     >(new CreateDeviceCommand(deviceDto));
+  }
+
+  private async refreshToken(
+    ip: string,
+    title: string,
+    userId: string,
+    deviceId: string,
+  ) {
+    return this.commandBus.execute(
+      new RefreshTokenCommand(ip, title, userId, deviceId),
+    );
   }
 
   private async deleteDevicesByUserId(userId: string): Promise<void> {
