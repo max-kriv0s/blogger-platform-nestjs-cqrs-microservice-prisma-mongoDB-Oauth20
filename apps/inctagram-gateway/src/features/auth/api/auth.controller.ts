@@ -56,7 +56,6 @@ export const endpoints = {
   login: () => `${baseUrl}/login`,
   newRefreshToken: () => `${baseUrl}/refresh-token`,
   gitHubLogin: () => `${baseUrl}/github`,
-  login: () => `${baseUrl}/login`,
 };
 
 @ApiTags('Auth')
