@@ -20,6 +20,7 @@ import {
   ERROR_PASSWORD_MUST_CONTAIN,
   ERROR_PASSWORDS_MUST_MATCH,
 } from '../../src/features/user/user.constants';
+import { LoginDto } from '@gateway/src/features/auth/dto/login.dto';
 
 jest.setTimeout(15000);
 
@@ -251,6 +252,54 @@ describe('AuthController (e2e) test', () => {
         return call[0] === userDto.email;
       });
       expect(callWithCurrentEmail.length).toBe(2);
+    });
+  });
+
+  describe('Getting new refresh token', () => {
+    let oldRefreshToken;
+    //let newrefreshToken;
+    let deviceName;
+
+    it(`${endpoints.newRefreshToken} (POST) Getting new refresh token`, async () => {
+      const userDto = authTestHelper.userDto();
+
+      await authTestHelper.registrationUser(userDto);
+      await new Promise((pause) => setTimeout(pause, 100));
+
+      const mock = emailAdapterMock.sendEmail.mock;
+      const lastMockCall = mock.calls.length - 1;
+
+      const message = mock.calls[lastMockCall][2];
+      const codeConfirmation = findUUIDv4(message);
+
+      await authTestHelper.confirmRegistration({ code: codeConfirmation });
+
+      const loginData = new LoginDto(userDto.email, userDto.password);
+
+      deviceName = 'chrome';
+
+      const tokenPairs = await authTestHelper.login(loginData, deviceName, {
+        expectedCode: 200,
+      });
+
+      oldRefreshToken = tokenPairs.headers['set-cookie'][0];
+
+      await authTestHelper.newRefreshToken(oldRefreshToken, deviceName, {
+        expectedCode: 201,
+      });
+    });
+
+    it(`${endpoints.newRefreshToken} (POST) Should NOT get new token 
+    pairs with old refresh token`, async () => {
+      const tokenPairs = await authTestHelper.newRefreshToken(
+        oldRefreshToken,
+        deviceName,
+        {
+          expectedCode: 401,
+        },
+      );
+
+      expect(tokenPairs.body.message).toEqual('Device not found');
     });
   });
 });

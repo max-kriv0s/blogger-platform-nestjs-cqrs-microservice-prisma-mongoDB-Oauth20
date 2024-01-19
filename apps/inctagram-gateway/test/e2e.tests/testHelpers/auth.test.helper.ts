@@ -8,6 +8,7 @@ import {
 } from '../../../src/features/user/dto';
 import { ConfirmationCodeDto } from '../../../src/features/auth/dto';
 import { getGlobalPrefix, randomString } from '../utils/tests.utils';
+import { LoginDto } from '@gateway/src/features/auth/dto/login.dto';
 
 export class AuthTestHelper {
   globalPrefix = getGlobalPrefix();
@@ -48,6 +49,39 @@ export class AuthTestHelper {
     return request(this.app.getHttpServer())
       .post(this.globalPrefix + endpoints.registrationConfirmation())
       .send(confirmDto)
+      .expect(expectedCode);
+  }
+
+  async login(
+    loginDto: LoginDto,
+    deviceName,
+    config: {
+      expectedCode?: number;
+    } = {},
+  ) {
+    const expectedCode = config.expectedCode ?? HttpStatus.NO_CONTENT;
+
+    return request(this.app.getHttpServer())
+      .post(this.globalPrefix + endpoints.login())
+      .send(loginDto)
+      .set('user-agent', deviceName)
+      .expect(expectedCode);
+  }
+
+  async newRefreshToken(
+    refreshToken,
+    deviceName,
+    config: {
+      expectedCode?: number;
+    } = {},
+  ) {
+    const expectedCode = config.expectedCode ?? HttpStatus.NO_CONTENT;
+
+    return request(this.app.getHttpServer())
+      .post(this.globalPrefix + endpoints.newRefreshToken())
+      .send()
+      .set('Cookie', `${refreshToken}`)
+      .set('user-agent', deviceName)
       .expect(expectedCode);
   }
 
