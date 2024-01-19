@@ -10,6 +10,7 @@ import { ResponseUserDto } from '@gateway/src/features/user/responses';
 import { CreateUserDto } from '@gateway/src/features/user/dto';
 import { endpoints } from '@gateway/src/features/user/api/user.controller';
 import { subYears } from 'date-fns';
+import { LoginDto } from '@gateway/src/features/auth/dto/login.dto';
 
 jest.setTimeout(15000);
 
@@ -19,6 +20,9 @@ describe('UserController (e2e) test', () => {
   let userTestHelper: UserTestHelper;
   let newUserData: CreateUserDto;
   let user: ResponseUserDto;
+
+  const deviceName = 'test device';
+  let loginDto: LoginDto;
 
   const emailAdapterMock = {
     sendEmail: jest.fn(),
@@ -43,6 +47,7 @@ describe('UserController (e2e) test', () => {
       authTestHelper,
       emailAdapterMock,
     );
+    loginDto = new LoginDto(newUserData.email, newUserData.password);
   });
 
   afterEach(async () => {
@@ -56,10 +61,7 @@ describe('UserController (e2e) test', () => {
 
   describe('Me', () => {
     it(`${endpoints.me()} (GET) - get profile correct data`, async () => {
-      const resTokens = await authTestHelper.login(
-        newUserData.email,
-        newUserData.password,
-      );
+      const resTokens = await authTestHelper.login(loginDto, deviceName);
       const accessToken = resTokens.body.accessToken;
       const { body } = await userTestHelper.me(accessToken);
 
@@ -90,10 +92,7 @@ describe('UserController (e2e) test', () => {
 
   describe('updateUser', () => {
     it(`${endpoints.updateUser()} (PUT) - update user correct data`, async () => {
-      const resTokens = await authTestHelper.login(
-        newUserData.email,
-        newUserData.password,
-      );
+      const resTokens = await authTestHelper.login(loginDto, deviceName);
       const accessToken = resTokens.body.accessToken;
 
       const updateUserDto = {

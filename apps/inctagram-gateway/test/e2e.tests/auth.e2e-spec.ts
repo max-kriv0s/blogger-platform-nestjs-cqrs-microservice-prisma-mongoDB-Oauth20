@@ -278,9 +278,7 @@ describe('AuthController (e2e) test', () => {
 
       deviceName = 'chrome';
 
-      const tokenPairs = await authTestHelper.login(loginData, deviceName, {
-        expectedCode: 200,
-      });
+      const tokenPairs = await authTestHelper.login(loginData, deviceName);
 
       oldRefreshToken = tokenPairs.headers['set-cookie'][0];
 
