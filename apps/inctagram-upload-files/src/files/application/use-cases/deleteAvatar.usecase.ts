@@ -2,7 +2,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { S3StorageAdapter } from '../../adapters';
 import { FileRepository } from '../../db/file.repository';
 import { AvatarDeleteResponse } from '@libs/contracts';
-import { Logger } from '@nestjs/common';
 
 export class DeleteAvatarCommand {
   constructor(public fileId: string) {}
@@ -23,6 +22,7 @@ export class DeleteAvatarUseCases
     const result = { isSuccess: true };
     const file = await this.fileRepo.findFileById(fileId);
     if (!file) {
+      result.isSuccess = false;
       return result;
     }
 
