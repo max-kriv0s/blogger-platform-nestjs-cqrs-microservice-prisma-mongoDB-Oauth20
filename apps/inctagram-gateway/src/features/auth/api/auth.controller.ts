@@ -31,7 +31,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ResponseUserDto } from '../../user/responses';
-import { BadRequestResponse, CustomError, Result } from '../../../core';
+import { BadRequestResponse, CustomError } from '../../../core';
 import { DeviceFacade } from '../../device/device.facade';
 import { PasswordAuthGuard } from '../guards/password.guard';
 import { CurrentUserId } from '../../../core/decorators/currentUserId.decorator';
@@ -212,19 +212,6 @@ export class AuthController {
       payload.deviceId,
     );
 
-    // const isDeleted: Result =
-    //   await this.deviceFacade.useCases.deleteDeviceByIdAndUserId(
-    //     payload.userId,
-    //     payload.deviceId,
-    //   );
-    //
-    // if (!isDeleted.isSuccess) {
-    //   throw isDeleted.err;
-    // }
-    //
-    // const result = await this.deviceFacade.useCases.createDevice(
-    //   new DeviceDto(ip, title, userId),
-    // );
     const { accessToken, refreshToken } = result.value;
 
     response.cookie('refreshToken', refreshToken, {

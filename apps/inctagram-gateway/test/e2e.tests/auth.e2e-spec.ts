@@ -287,8 +287,6 @@ describe('AuthController (e2e) test', () => {
       await authTestHelper.newRefreshToken(oldRefreshToken, deviceName, {
         expectedCode: 201,
       });
-
-      //newrefreshToken = newTokenPairs.headers['set-cookie'][0];
     });
 
     it(`${endpoints.newRefreshToken} (POST) Should NOT get new token 
