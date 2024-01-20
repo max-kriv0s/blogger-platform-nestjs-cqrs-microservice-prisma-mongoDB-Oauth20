@@ -63,13 +63,14 @@ enum Provider {
 }
 
 model Post {
-  id        String   @id @default(uuid())
-  title     String
-  authorId  String
+  id String @id @default(uuid())
+  description String
+  authorId String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   isDeleted Boolean  @default(false)
   author    User     @relation(fields: [authorId], references: [id])
+  imageId String? @map("image_id")
 
   @@map("posts")
 }
