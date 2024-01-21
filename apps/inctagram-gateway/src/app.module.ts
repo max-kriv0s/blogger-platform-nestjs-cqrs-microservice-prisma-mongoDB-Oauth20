@@ -5,6 +5,7 @@ import { PrismaModule } from './core/prisma/prisma.module';
 import { UserModule } from './features/user/user.module';
 import { EmailManagerModule } from './core/email-manager/email-manager.module';
 import { DeviceModule } from './features/device/device.module';
+import { PostModule } from '@gateway/src/features/post/post.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { DeviceModule } from './features/device/device.module';
     UserModule,
     DeviceModule,
     EmailManagerModule,
+    PostModule,
   ],
   controllers: [],
   providers: [],
