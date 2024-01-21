@@ -1,6 +1,5 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Result } from '@gateway/src/core';
-import { DeviceFacade } from '../../device.facade';
 import { DeviceDto } from '@gateway/src/features/device/dto';
 import {
   CreateDeviceCommand,

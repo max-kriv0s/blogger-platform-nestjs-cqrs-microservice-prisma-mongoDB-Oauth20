@@ -8,4 +8,6 @@ export interface IFile {
   format: string;
   url: string;
   fileId: string;
+  ownerId?: string;
+  expirationDate?: Date;
 }

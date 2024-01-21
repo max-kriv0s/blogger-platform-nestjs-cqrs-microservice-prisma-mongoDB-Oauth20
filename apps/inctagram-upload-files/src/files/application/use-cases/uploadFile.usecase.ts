@@ -1,26 +1,22 @@
-import { AvatarUploadRequest, AvatarUploadResponse } from '@libs/contracts';
+import { FileUploadRequest, FileUploadResponse } from '@libs/contracts';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { S3StorageAdapter } from '../../adapters';
 import { FileRepository } from '../../db/file.repository';
 import { FileEntity } from '../../entities/file.entity';
 import { IFile } from '../../interface/file.interface';
 
-export class UploadAvatarCommand {
-  constructor(public payload: AvatarUploadRequest) {}
+export class UploadFileCommand {
+  constructor(public payload: FileUploadRequest) {}
 }
 
-@CommandHandler(UploadAvatarCommand)
-export class UploadAvatarUseCase
-  implements ICommandHandler<UploadAvatarCommand>
-{
+@CommandHandler(UploadFileCommand)
+export class UploadFileUseCase implements ICommandHandler<UploadFileCommand> {
   constructor(
     private readonly fileStorageAdapter: S3StorageAdapter,
     private readonly fileRepo: FileRepository,
   ) {}
 
-  async execute({
-    payload,
-  }: UploadAvatarCommand): Promise<AvatarUploadResponse> {
+  async execute({ payload }: UploadFileCommand): Promise<FileUploadResponse> {
     const downloadFile = await this.fileStorageAdapter.saveAvatar(payload);
 
     // TODO добавить проверку валидации полей payload

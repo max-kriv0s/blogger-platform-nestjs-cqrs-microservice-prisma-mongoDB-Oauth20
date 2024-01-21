@@ -10,6 +10,8 @@ export class FileEntity implements IFile {
   format: string;
   url: string;
   fileId: string;
+  ownerId?: string;
+  expirationDate?: Date;
 
   constructor(file: IFile) {
     this._id = file._id;
@@ -19,11 +21,21 @@ export class FileEntity implements IFile {
     this.format = file.format;
     this.url = file.url;
     this.fileId = file.fileId;
+    this.ownerId = file.ownerId;
+    this.expirationDate = file.expirationDate;
   }
 
   updateFileInfo(fileInfo: FileSaveResponse) {
     this.url = fileInfo.url;
     this.fileId = fileInfo.fileId;
     return this;
+  }
+
+  setOwnerId(ownerId: string) {
+    this.ownerId = ownerId;
+  }
+
+  updateExpirationDate(date: Date) {
+    this.expirationDate = date;
   }
 }

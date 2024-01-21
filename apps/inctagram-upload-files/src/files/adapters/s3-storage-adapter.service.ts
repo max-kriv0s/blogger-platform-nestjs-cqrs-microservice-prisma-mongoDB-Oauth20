@@ -4,7 +4,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { AvatarUploadRequest } from '@libs/contracts';
+import { FileUploadRequest } from '@libs/contracts';
 import { YandexCloudBacketConfig } from '../config/yandex-cloud-backet.configuration';
 import { FileSaveResponse } from '../types/fileSave.response';
 
@@ -36,7 +36,7 @@ export class S3StorageAdapter {
     originalname,
     buffer,
     format,
-  }: AvatarUploadRequest): Promise<FileSaveResponse> {
+  }: FileUploadRequest): Promise<FileSaveResponse> {
     const key = `content/users/${userId}/avatars/${originalname}`;
     const bucketParams = {
       Bucket: this.bucketName,
