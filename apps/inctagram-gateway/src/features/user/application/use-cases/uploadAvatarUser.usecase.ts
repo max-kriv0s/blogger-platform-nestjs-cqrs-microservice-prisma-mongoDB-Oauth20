@@ -1,4 +1,4 @@
-import { AvatarUploadRequest, AvatarUploadResponse } from '@libs/contracts';
+import { FileUploadRequest, FileUploadResponse } from '@libs/contracts';
 import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ClientProxy } from '@nestjs/microservices';
@@ -42,21 +42,22 @@ export class UploadAvatarUserUseCase
       return Result.Err(resultValidate.err);
     }
 
-    const payload: AvatarUploadRequest = {
+    const payload: FileUploadRequest = {
       userId: data.userId,
       originalname: data.originalname,
       buffer: data.buffer,
       format: metadata.format,
       fileType: FileType.Avatar,
+      ownerId: data.userId,
     };
 
     let fileId: string;
     try {
       const responseOfService = this.fileServiceClient
-        .send({ cmd: 'upload_avatar' }, payload)
+        .send({ cmd: 'upload_file' }, payload)
         .pipe(timeout(10000));
 
-      const resultResponse: AvatarUploadResponse = await firstValueFrom(
+      const resultResponse: FileUploadResponse = await firstValueFrom(
         responseOfService,
       );
       fileId = resultResponse.fileId;

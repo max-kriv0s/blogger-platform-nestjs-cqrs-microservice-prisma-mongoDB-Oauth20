@@ -1,3 +1,1 @@
-export class EmailManagerConfig {
-    
-}
+export class EmailManagerConfig {}

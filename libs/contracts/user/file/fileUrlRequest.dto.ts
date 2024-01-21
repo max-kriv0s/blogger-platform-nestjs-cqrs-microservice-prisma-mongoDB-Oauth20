@@ -1,3 +1,3 @@
 export class FileUrlRequest {
-    fileId: string;
+  fileId: string;
 }

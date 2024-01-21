@@ -1,25 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  UploadAvatarCommand,
-  UploadAvatarUseCase,
-} from './uploadAvatar.usecase';
+import { UploadFileCommand, UploadFileUseCase } from './uploadFile.usecase';
 import { S3StorageAdapter } from '../../adapters';
 import { FileSaveResponse } from '../../types/fileSave.response';
 import { getModelToken } from '@nestjs/mongoose';
 import { File } from '../../models/file.model';
 import { Model } from 'mongoose';
-import { AvatarUploadRequest } from '@libs/contracts';
+import { FileUploadRequest } from '@libs/contracts';
 import { FileType } from '@libs/types/fileType.enum';
 import { FileRepository } from '../../db/file.repository';
 import { AppModule } from '@fileService/src/app.module';
 
 // TODO можно ли как-то ускорить тест?
 
-describe('UploadAvatarUseCase', () => {
+describe('UploadFileUseCase', () => {
   let module: TestingModule;
   let fileStorageAdapter: S3StorageAdapter;
   let fileModel: Model<File>;
-  let useCase: UploadAvatarUseCase;
+  let useCase: UploadFileUseCase;
 
   const mockFileModel = {
     save: jest.fn(),
@@ -33,7 +30,7 @@ describe('UploadAvatarUseCase', () => {
     module = await Test.createTestingModule({
       imports: [AppModule],
       providers: [
-        UploadAvatarUseCase,
+        UploadFileUseCase,
         { provide: S3StorageAdapter, useValue: mockS3StorageAdapter },
         FileRepository,
         { provide: getModelToken(File.name), useValue: mockFileModel },
@@ -41,7 +38,7 @@ describe('UploadAvatarUseCase', () => {
     }).compile();
 
     fileStorageAdapter = module.get<S3StorageAdapter>(S3StorageAdapter);
-    useCase = module.get<UploadAvatarUseCase>(UploadAvatarUseCase);
+    useCase = module.get<UploadFileUseCase>(UploadFileUseCase);
     fileModel = module.get<Model<File>>(getModelToken(File.name));
   });
 
@@ -62,7 +59,7 @@ describe('UploadAvatarUseCase', () => {
         .spyOn(fileStorageAdapter, 'saveAvatar')
         .mockReturnValueOnce(Promise.resolve(fileStorageResult));
 
-      const payload: AvatarUploadRequest = {
+      const payload: FileUploadRequest = {
         userId: 'userId',
         originalname: 'originalname',
         buffer: null,
@@ -83,7 +80,7 @@ describe('UploadAvatarUseCase', () => {
         .spyOn(fileModel.prototype, 'save')
         .mockImplementationOnce(() => Promise.resolve(saveResponse));
 
-      const command = new UploadAvatarCommand(payload);
+      const command = new UploadFileCommand(payload);
       const result = await useCase.execute(command);
 
       expect(result.fileId).toBe(fileIdResponse._id);

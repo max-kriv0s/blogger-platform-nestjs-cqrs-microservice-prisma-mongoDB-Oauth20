@@ -4,18 +4,15 @@ import { getModelToken } from '@nestjs/mongoose';
 import { File } from '../../models/file.model';
 import { FileRepository } from '../../db/file.repository';
 import { AppModule } from '@fileService/src/app.module';
-import {
-  DeleteAvatarCommand,
-  DeleteAvatarUseCases,
-} from './deleteAvatar.usecase';
+import { DeleteFileCommand, DeleteFileUseCases } from './deleteFile.usecase';
 
 // TODO можно ли как-то ускорить тест?
 
-describe('DeleteAvatarUseCases', () => {
+describe('DeleteFileUseCases', () => {
   let module: TestingModule;
   let fileStorageAdapter: S3StorageAdapter;
   let fileRepo: FileRepository;
-  let useCase: DeleteAvatarUseCases;
+  let useCase: DeleteFileUseCases;
 
   const mockFileModel = {
     save: jest.fn(),
@@ -34,7 +31,7 @@ describe('DeleteAvatarUseCases', () => {
     module = await Test.createTestingModule({
       imports: [AppModule],
       providers: [
-        DeleteAvatarUseCases,
+        DeleteFileUseCases,
         { provide: S3StorageAdapter, useValue: mockS3StorageAdapter },
         { provide: FileRepository, useValue: mockFileRepository },
         { provide: getModelToken(File.name), useValue: mockFileModel },
@@ -42,7 +39,7 @@ describe('DeleteAvatarUseCases', () => {
     }).compile();
 
     fileStorageAdapter = module.get<S3StorageAdapter>(S3StorageAdapter);
-    useCase = module.get<DeleteAvatarUseCases>(DeleteAvatarUseCases);
+    useCase = module.get<DeleteFileUseCases>(DeleteFileUseCases);
     fileRepo = module.get<FileRepository>(FileRepository);
     // fileModel = module.get<Model<File>>(getModelToken(File.name));
   });
@@ -68,7 +65,7 @@ describe('DeleteAvatarUseCases', () => {
         .spyOn(fileStorageAdapter, 'deleteAvatar')
         .mockReturnValueOnce(true as any);
 
-      const command = new DeleteAvatarCommand(mockFile._id);
+      const command = new DeleteFileCommand(mockFile._id);
       const result = await useCase.execute(command);
 
       const findFileResponse = spyfindFileById.mock.results[0].value;
@@ -91,7 +88,7 @@ describe('DeleteAvatarUseCases', () => {
         .spyOn(fileStorageAdapter, 'deleteAvatar')
         .mockReturnValueOnce(true as any);
 
-      const command = new DeleteAvatarCommand('');
+      const command = new DeleteFileCommand('');
       const result = await useCase.execute(command);
 
       const findFileResponse = spyfindFileById.mock.results[0].value;
