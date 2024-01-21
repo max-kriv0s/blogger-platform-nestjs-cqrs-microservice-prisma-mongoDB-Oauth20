@@ -7,7 +7,6 @@ import {
   ERROR_NOT_PERMITTED,
   ERROR_POST_NOT_FOUND,
 } from '@gateway/src/features/post/post.constants';
-import { UserRepository } from '@gateway/src/features/user/db';
 
 export class UpdatePostCommand {
   constructor(
@@ -19,10 +18,7 @@ export class UpdatePostCommand {
 
 @CommandHandler(UpdatePostCommand)
 export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
-  constructor(
-    private postRepo: PostRepository,
-    private userRepo: UserRepository,
-  ) {}
+  constructor(private postRepo: PostRepository) {}
 
   async execute(command: UpdatePostCommand) {
     const post = await this.postRepo.findById(command.postId);
@@ -31,12 +27,13 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
       return Result.Err(new NotFoundError(ERROR_POST_NOT_FOUND));
     }
 
-    const user = await this.userRepo.findById(command.userId);
-
-    if (user.id !== post.authorId) {
+    if (command.userId !== post.authorId) {
       return Result.Err(new ForbiddenError(ERROR_NOT_PERMITTED));
     }
 
-    await this.postRepo.update(command.postId, command.updatePostDto);
+    await this.postRepo.update(
+      command.postId,
+      command.updatePostDto.description,
+    );
   }
 }

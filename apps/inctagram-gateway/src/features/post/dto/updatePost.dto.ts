@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Length, IsString, IsNotEmpty } from 'class-validator';
+import { Length, IsString, IsNotEmpty, Matches } from 'class-validator';
 import { ERROR_LENGTH_DESCRIPTION } from '@gateway/src/features/post/post.constants';
 
 export class UpdatePostDto {
@@ -11,7 +11,7 @@ export class UpdatePostDto {
     maxLength: 500,
     pattern: '0-9; A-Z; a-z; _ ; -',
   })
-  //TODO: Do I need matches here?
+  @Matches('^[a-zA-Z0-9_-]*$')
   @Length(3, 500, { message: ERROR_LENGTH_DESCRIPTION })
   @IsString()
   @IsNotEmpty()

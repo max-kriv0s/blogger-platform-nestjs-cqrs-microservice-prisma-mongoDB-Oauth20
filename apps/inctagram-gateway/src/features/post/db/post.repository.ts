@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@gateway/src/core/prisma/prisma.servise';
-import { Post } from '@prisma/client';
 
 @Injectable()
 export class PostRepository {
@@ -9,10 +8,10 @@ export class PostRepository {
     return this.prismaService.post.findUnique({ where: { id } });
   }
 
-  async update(id: string, data: Partial<Omit<Post, 'id'>>) {
+  async update(id: string, description: string) {
     return this.prismaService.post.update({
       where: { id },
-      data,
+      data: { description: description, createdAt: new Date() },
     });
   }
 }
