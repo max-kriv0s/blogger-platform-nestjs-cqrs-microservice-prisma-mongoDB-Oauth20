@@ -22,6 +22,12 @@ export class File extends Document implements IFile {
 
   @Prop({ required: true })
   fileId: string;
+
+  @Prop({ required: false })
+  ownerId: string;
+
+  @Prop({ required: false })
+  expirationDate: Date;
 }
 
 export const FileSchema = SchemaFactory.createForClass(File);
