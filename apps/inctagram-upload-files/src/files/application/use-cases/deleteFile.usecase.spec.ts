@@ -29,7 +29,6 @@ describe('DeleteFileUseCases', () => {
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
-      imports: [AppModule],
       providers: [
         DeleteFileUseCases,
         { provide: S3StorageAdapter, useValue: mockS3StorageAdapter },
