@@ -50,7 +50,7 @@ export class UploadAvatarUserUseCase
       fileType: FileType.Avatar,
       ownerId: data.userId,
     };
-
+    // TODO - вынести в адаптер для файлового сервиса
     let fileId: string;
     try {
       const responseOfService = this.fileServiceClient
