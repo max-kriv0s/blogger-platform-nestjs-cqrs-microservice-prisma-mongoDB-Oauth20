@@ -4,10 +4,23 @@ import { PostRepository } from '@gateway/src/features/post/db/post.repository';
 import { POST_USE_CASE } from '@gateway/src/features/post/application/use-cases';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PostQueryRepository } from '@gateway/src/features/post/db/post.query.repository';
+import {
+  FileServiceAdapter,
+  getClientFileServiceConfig,
+} from '@gateway/src/core';
+import { ClientsModule } from '@nestjs/microservices';
 
 @Module({
-  imports: [CqrsModule],
+  imports: [
+    CqrsModule,
+    ClientsModule.registerAsync([getClientFileServiceConfig()]),
+  ],
   controllers: [PostController],
-  providers: [PostRepository, ...POST_USE_CASE, PostQueryRepository],
+  providers: [
+    PostRepository,
+    ...POST_USE_CASE,
+    PostQueryRepository,
+    FileServiceAdapter,
+  ],
 })
 export class PostModule {}
