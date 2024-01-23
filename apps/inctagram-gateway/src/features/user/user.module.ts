@@ -12,7 +12,7 @@ import {
 import { USER_USE_CASES } from './application';
 import { ClientsModule } from '@nestjs/microservices';
 import { UserController } from './api/user.controller';
-import { getClientFileServiceConfig } from './config/clientFileService.config';
+import { getClientFileServiceConfig } from '@gateway/src/core';
 
 @Module({
   imports: [
