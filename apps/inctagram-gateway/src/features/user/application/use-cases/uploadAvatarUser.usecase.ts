@@ -37,7 +37,7 @@ export class UploadAvatarUserUseCase
 
     const payload = this.getPayload(data, metadata);
 
-    const downloadResult = await this.fileServiceAdapter.send(payload);
+    const downloadResult = await this.fileServiceAdapter.upload(payload);
     if (!downloadResult.isSuccess) {
       return Result.Err(downloadResult.err);
     }
