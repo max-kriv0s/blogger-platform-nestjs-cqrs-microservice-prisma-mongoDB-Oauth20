@@ -70,9 +70,16 @@ model Post {
   updatedAt DateTime @updatedAt @map("updated_at")
   isDeleted Boolean  @default(false)
   author    User     @relation(fields: [authorId], references: [id])
-  imageId String? @map("image_id")
+  images PostImage[]
 
   @@map("posts")
+}
+
+model PostImage {
+  id String @id @default(uuid())
+  postId String
+  imageId String? @map("image_id")
+  post Post @relation(fields: [postId], references: [id])
 }
 
 model Device {
