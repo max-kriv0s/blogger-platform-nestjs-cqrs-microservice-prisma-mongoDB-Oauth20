@@ -1,17 +1,17 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { AppModule } from '../../src/app.module';
-import { EmailManagerModule } from '../../src/core/email-manager/email-manager.module';
-import { EmailAdapter } from '../../src/infrastructure';
-import { AuthTestHelper } from './testHelpers/auth.test.helper';
+import { AppModule } from '@gateway/src/app.module';
+import { EmailManagerModule } from '@gateway/src/core/email-manager/email-manager.module';
+import { EmailAdapter } from '@gateway/src/infrastructure';
+import { AuthTestHelper } from '@gateway/test/e2e.tests/testHelpers/auth.test.helper';
 import {
   findUUIDv4,
   getAppForE2ETesting,
   getErrorMessagesBadRequest,
   randomString,
-} from './utils/tests.utils';
-import { endpoints } from '../../src/features/auth/api';
-import { ResponseUserDto } from '../../src/features/user/responses';
+} from '@gateway/test/e2e.tests/utils/tests.utils';
+import { endpoints } from '@gateway/src/features/auth/api';
+import { ResponseUserDto } from '@gateway/src/features/user/responses';
 import {
   ERROR_EMAIL_IS_ALREADY_REGISTRED,
   ERROR_FORMAT_EMAIL,
@@ -19,7 +19,7 @@ import {
   ERROR_LENGTH_USERNAME,
   ERROR_PASSWORD_MUST_CONTAIN,
   ERROR_PASSWORDS_MUST_MATCH,
-} from '../../src/features/user/user.constants';
+} from '@gateway/src/features/user/user.constants';
 import { LoginDto } from '@gateway/src/features/auth/dto/login.dto';
 
 jest.setTimeout(15000);
