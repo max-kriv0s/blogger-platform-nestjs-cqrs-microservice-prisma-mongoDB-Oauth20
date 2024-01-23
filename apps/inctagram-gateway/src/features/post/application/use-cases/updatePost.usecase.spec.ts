@@ -1,37 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
-
 import { PrismaService } from '@gateway/src/core/prisma/prisma.servise';
 import { AppModule } from '@gateway/src/app.module';
-import { PostRepository } from '@gateway/src/features/post/db/post.repository';
+import { UpdatePostDto } from '@gateway/src/features/post/dto/updatePost.dto';
+import {
+  UpdatePostCommand,
+  UpdatePostUseCase,
+} from '@gateway/src/features/post/application/use-cases/updatePost.usecase';
+import { randomString } from '@gateway/test/e2e.tests/utils/tests.utils';
+import { Post } from '@prisma/client';
 
 describe('UpdatePostUseCase', () => {
   let module: TestingModule;
-  //let postRepository: PostRepository;
   let prismaService: PrismaService;
-  //let postModel: Model<File>;
-  //let useCase: UpdatePostUseCase;
-
-  // const mockFileModel = {
-  //   save: jest.fn(),
-  // };
-  //
-  // const mockPostRepo = {
-  //   updatePost: jest.fn(),
-  // };
+  let useCase: UpdatePostUseCase;
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
       imports: [AppModule],
-      // providers: [
-      //   UpdatePostUseCase,
-      //   { provide: PostRepository, useValue: mockPostRepo },
-      // ],
     }).compile();
 
-    postRepository = module.get<PostRepository>(PostRepository);
     prismaService = module.get<PrismaService>(PrismaService);
-    // useCase = module.get<UpdatePostUseCase>(UpdatePostUseCase);
-    // fileModel = module.get<Model<Post>>(getModelToken(File.name));
+    useCase = module.get<UpdatePostUseCase>(UpdatePostUseCase);
   });
 
   afterEach(async () => {
@@ -42,17 +31,37 @@ describe('UpdatePostUseCase', () => {
 
   describe('execute', () => {
     it('should update post description', async () => {
-      console.log('test');
-      const postDto = {
-        description: 'new post created',
-        authorId: '550e8400-e29b-41d4-a716-446655440000',
-        createdAt: new Date(),
-        //imageId: '550e8400-e29b-41d4-a716-446655440000',
+      const userDto = {
+        name: randomString(10),
+        email: `${randomString(6)}@test.com`,
+        hashPassword: '12345',
       };
 
-      const post = await prismaService.post.create({ data: postDto });
+      const user = await prismaService.user.create({ data: userDto });
 
-      console.log(post);
+      const postDto = {
+        description: 'new post created',
+        authorId: user.id,
+        createdAt: new Date(),
+      };
+
+      const post: Post = await prismaService.post.create({ data: postDto });
+
+      const payload: UpdatePostDto = {
+        description: 'post updated',
+      };
+
+      const updateResult = await useCase.execute(
+        new UpdatePostCommand(post.id, payload, user.id),
+      );
+
+      expect(updateResult.isSuccess).toBe(true);
+
+      const updatedPost = await prismaService.post.findUnique({
+        where: { id: post.id },
+      });
+
+      expect(updatedPost.description).toEqual('post updated');
     });
   });
 });

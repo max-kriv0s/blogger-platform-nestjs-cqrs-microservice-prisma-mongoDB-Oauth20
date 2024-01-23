@@ -31,9 +31,11 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
       return Result.Err(new ForbiddenError(ERROR_NOT_PERMITTED));
     }
 
-    await this.postRepo.update(
+    const updatedPost = await this.postRepo.update(
       command.postId,
       command.updatePostDto.description,
     );
+
+    return Result.Ok(updatedPost.id);
   }
 }
