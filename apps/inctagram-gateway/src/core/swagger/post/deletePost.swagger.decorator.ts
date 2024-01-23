@@ -4,15 +4,22 @@ import {
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
   ApiNoContentResponse,
+  ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { ApiErrorResponse } from '../../responses';
-import { NOT_FOUND } from '../swagger.constants';
+import { NOT_FOUND, NOT_PERMITTED, UNAUTHORIZED } from '../swagger.constants';
 
-export function DeleteUserAvatarSwaggerDecorator() {
+export function DeletePostSwaggerDecorator() {
   return applyDecorators(
-    ApiUnauthorizedResponse({ type: ApiErrorResponse }),
+    ApiUnauthorizedResponse({
+      type: ApiErrorResponse,
+      description: UNAUTHORIZED,
+    }),
     ApiOperation({
-      summary: 'Delete user avatar',
+      summary: 'Delete post',
+    }),
+    ApiForbiddenResponse({
+      description: NOT_PERMITTED,
     }),
     ApiNoContentResponse(),
     ApiNotFoundResponse({ type: ApiErrorResponse, description: NOT_FOUND }),

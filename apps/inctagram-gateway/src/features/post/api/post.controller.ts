@@ -1,4 +1,13 @@
-import { Body, Controller, Param, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpdatePostDto } from '@gateway/src/features/post/dto/updatePost.dto';
 import { CurrentUserId } from '@gateway/src/core/decorators/currentUserId.decorator';
@@ -8,6 +17,8 @@ import { AccessTokenGuard } from '@gateway/src/features/auth/guards/accessJwt.gu
 import { Result } from '../../../core';
 import { PostQueryRepository } from '@gateway/src/features/post/db/post.query.repository';
 import { UpdatePostSwaggerDecorator } from '@gateway/src/core/swagger/post/updatePost.swagger.decorator';
+import { DeletePostCommand } from '@gateway/src/features/post/application/use-cases/deletePost.usecase';
+import { DeletePostSwaggerDecorator } from '@gateway/src/core/swagger/post/deletePost.swagger.decorator';
 
 @ApiTags('Post')
 @ApiBearerAuth()
@@ -42,5 +53,22 @@ export class PostController {
       throw postViewResult.err;
     }
     return postViewResult.value;
+  }
+
+  @DeletePostSwaggerDecorator()
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePost(
+    @Param('id') postId: string,
+    @CurrentUserId() userId: string,
+  ) {
+    const deleteResult = await this.commandBus.execute<
+      DeletePostCommand,
+      Result
+    >(new DeletePostCommand(postId, userId));
+
+    if (!deleteResult.isSuccess) throw deleteResult.err;
+
+    return deleteResult;
   }
 }

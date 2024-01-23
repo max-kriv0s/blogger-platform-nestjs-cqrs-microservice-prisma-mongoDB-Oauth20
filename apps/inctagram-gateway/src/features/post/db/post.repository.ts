@@ -14,4 +14,9 @@ export class PostRepository {
       data: { description: description, createdAt: new Date() },
     });
   }
+  async delete(id: string) {
+    return this.prismaService.post.delete({
+      where: { id },
+    });
+  }
 }
