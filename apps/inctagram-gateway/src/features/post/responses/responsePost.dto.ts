@@ -31,16 +31,16 @@ export class ResponsePostDto {
   updatedAt: string;
 
   @ApiProperty({ description: 'image id', type: 'string' })
-  imageId: string;
+  imageUrl: string[];
 
-  static getView(post: Post, imageId?: string): ResponsePostDto {
+  static getView(post: Post, imageUrl?: string[]): ResponsePostDto {
     return {
       id: post.id,
       description: post.description,
       authorId: post.authorId,
       createdAt: post.createdAt.toISOString(),
       updatedAt: post.updatedAt.toISOString(),
-      imageId: imageId ? imageId : null,
+      imageUrl: imageUrl ? imageUrl : null,
     };
   }
 }

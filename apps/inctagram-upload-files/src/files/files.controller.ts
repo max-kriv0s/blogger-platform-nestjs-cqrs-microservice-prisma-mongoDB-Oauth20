@@ -1,6 +1,8 @@
 import {
   FileDeleteRequest,
   FileDeleteResponse,
+  FileUpdateOwnerIdRequest,
+  FileUpdateOwnerIdResponse,
   FileUploadRequest,
   FileUploadResponse,
   FileUrlRequest,
@@ -36,5 +38,12 @@ export class FilesController {
   @MessagePattern({ cmd: 'get_file_url' })
   async getFileInfo({ fileId }: FileUrlRequest): Promise<FileUrlResponse> {
     return this.filesService.getFileUrl(fileId);
+  }
+
+  @MessagePattern({ cmd: 'update_owner_id_file' })
+  async updateOwnerIdFile(
+    updateDto: FileUpdateOwnerIdRequest,
+  ): Promise<FileUpdateOwnerIdResponse> {
+    return this.filesService.updateOwnerIdFile(updateDto);
   }
 }

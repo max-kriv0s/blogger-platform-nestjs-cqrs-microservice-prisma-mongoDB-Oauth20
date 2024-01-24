@@ -26,4 +26,8 @@ export class FileRepository {
   async deleteFile(id: string) {
     return this.fileModel.deleteOne({ _id: new Types.ObjectId(id) });
   }
+
+  async updateOwnerId(ids: string[], ownerId: string) {
+    this.fileModel.updateMany({ _id: { $in: ids } }, { set$: { ownerId } });
+  }
 }

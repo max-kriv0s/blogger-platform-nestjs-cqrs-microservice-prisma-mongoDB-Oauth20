@@ -20,9 +20,14 @@ import { UpdatePostSwaggerDecorator } from '@gateway/src/core/swagger/post/updat
 import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadImageConfig } from '../config/uploadImage.config';
 import { ImageInputDto } from '../../user/dto';
-import { UploadImagePostCommand } from '../application/use-cases';
+import {
+  CreatePostCommand,
+  UploadImagePostCommand,
+} from '../application/use-cases';
 import { FileUploadResponse } from '@libs/contracts';
 import { UploadImagePostSwaggerDecorator } from '@gateway/src/core/swagger/post/uploadImagePost.swagger.decorator';
+import { CreatePostDto } from '../dto/createPost.dto';
+import { ResponsePostDto } from '../responses/responsePost.dto';
 
 @ApiTags('Post')
 @ApiBearerAuth()
@@ -80,5 +85,27 @@ export class PostController {
       throw downloadResult.err;
     }
     return downloadResult.value;
+  }
+
+  @Post()
+  async createPost(
+    @Body() createDto: CreatePostDto,
+    @CurrentUserId() userId: string,
+  ): Promise<ResponsePostDto> {
+    const resultCreation = await this.commandBus.execute<CreatePostCommand>(
+      new CreatePostCommand(createDto, userId),
+    );
+    if (!resultCreation.isSuccess) {
+      throw resultCreation.err;
+    }
+
+    const postViewResult = await this.postQueryRepo.getPostViewById(
+      resultCreation.value.id,
+    );
+
+    if (!postViewResult.isSuccess) {
+      throw postViewResult.err;
+    }
+    return postViewResult.value;
   }
 }

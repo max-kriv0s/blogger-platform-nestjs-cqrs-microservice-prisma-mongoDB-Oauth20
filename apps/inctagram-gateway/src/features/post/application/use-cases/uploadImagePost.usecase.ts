@@ -29,7 +29,7 @@ export class UploadImagePostUseCase
     }
 
     const payload = this.getPayload(imageDto, metadata);
-    return this.fileServiceAdapter.send(payload);
+    return this.fileServiceAdapter.upload(payload);
   }
 
   private validateImage(metadata: sharp.Metadata) {

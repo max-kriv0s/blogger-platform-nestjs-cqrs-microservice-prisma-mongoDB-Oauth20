@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { S3StorageAdapter } from './adapters';
-import { FileUrlResponse } from '@libs/contracts';
+import {
+  FileUpdateOwnerIdRequest,
+  FileUpdateOwnerIdResponse,
+  FileUrlResponse,
+} from '@libs/contracts';
 import { FileRepository } from './db/file.repository';
 import { ERROR_FILE_NOT_FOUND } from './constants/fileError.constant';
 
@@ -18,5 +22,13 @@ export class FilesService {
     }
 
     return { url: this.fileStorageAdapter.getUrlFile(file.url) };
+  }
+
+  async updateOwnerIdFile({
+    ids,
+    ownerId,
+  }: FileUpdateOwnerIdRequest): Promise<FileUpdateOwnerIdResponse> {
+    await this.fileRepo.updateOwnerId(ids, ownerId);
+    return { isSuccess: true };
   }
 }

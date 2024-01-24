@@ -17,6 +17,8 @@ export class PostQueryRepository {
       return Result.Err(new NotFoundError(ERROR_POST_NOT_FOUND));
     }
 
+    // TODO - тут нужен запрос на файловый сервис за image url
+
     return Result.Ok(ResponsePostDto.getView(post));
   }
 }
