@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Post,
   Put,
@@ -56,12 +57,7 @@ export class PostController {
 
     if (!updateResult.isSuccess) throw updateResult.err;
 
-    const postViewResult = await this.postQueryRepo.getPostViewById(postId);
-
-    if (!postViewResult.isSuccess) {
-      throw postViewResult.err;
-    }
-    return postViewResult.value;
+    return this.getPostView(postId, userId);
   }
 
   @UploadImagePostSwaggerDecorator()
@@ -98,9 +94,21 @@ export class PostController {
     if (!resultCreation.isSuccess) {
       throw resultCreation.err;
     }
+    return this.getPostView(resultCreation.value.id, userId);
+  }
 
+  @Get(':id')
+  async getPost(@Param('id') postId: string, @CurrentUserId() userId: string) {
+    return this.getPostView(postId, userId);
+  }
+
+  private async getPostView(
+    postId: string,
+    userId: string,
+  ): Promise<ResponsePostDto> {
     const postViewResult = await this.postQueryRepo.getPostViewById(
-      resultCreation.value.id,
+      postId,
+      userId,
     );
 
     if (!postViewResult.isSuccess) {

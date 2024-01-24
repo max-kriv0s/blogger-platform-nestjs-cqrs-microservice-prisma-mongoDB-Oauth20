@@ -23,6 +23,10 @@ export class FileRepository {
     return this.fileModel.findById(id);
   }
 
+  async findFilesByIds(ids: string[]) {
+    return this.fileModel.find({ _id: { $in: ids } });
+  }
+
   async deleteFile(id: string) {
     return this.fileModel.deleteOne({ _id: new Types.ObjectId(id) });
   }
