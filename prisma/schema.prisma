@@ -80,6 +80,8 @@ model PostImage {
   postId String
   imageId String? @map("image_id")
   post Post @relation(fields: [postId], references: [id])
+
+  @@map("post_image")
 }
 
 model Device {
