@@ -1,4 +1,4 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostRepository } from '@gateway/src/features/post/db/post.repository';
 import { Result } from '@gateway/src/core';
 import { ForbiddenError, NotFoundError } from '@gateway/src/core';
@@ -6,6 +6,7 @@ import {
   ERROR_NOT_PERMITTED,
   ERROR_POST_NOT_FOUND,
 } from '@gateway/src/features/post/post.constants';
+import { DeleteFileCommand } from '@fileService/src/files/application';
 
 export class DeletePostCommand {
   constructor(
@@ -16,7 +17,10 @@ export class DeletePostCommand {
 
 @CommandHandler(DeletePostCommand)
 export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
-  constructor(private postRepo: PostRepository) {}
+  constructor(
+    private readonly postRepo: PostRepository,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   async execute(command: DeletePostCommand) {
     const post = await this.postRepo.findById(command.postId);
@@ -29,8 +33,9 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
       return Result.Err(new ForbiddenError(ERROR_NOT_PERMITTED));
     }
 
-    const deleteResult = await this.postRepo.delete(command.postId);
+    await this.commandBus.execute(new DeleteFileCommand(post.imageId));
+    await this.postRepo.delete(command.postId);
 
-    return deleteResult ? Result.Ok() : Result.Err(ERROR_POST_NOT_FOUND); //TODO: Do I return this
+    return Result.Ok();
   }
 }
