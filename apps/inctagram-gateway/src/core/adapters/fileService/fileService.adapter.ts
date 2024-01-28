@@ -2,6 +2,7 @@ import {
   FileDeleteResponse,
   FileUploadRequest,
   FileUploadResponse,
+  FilesUrlResponse,
 } from '@libs/contracts';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
@@ -10,6 +11,7 @@ import { firstValueFrom, timeout } from 'rxjs';
 import { BadGatewayError } from '../../exceptions';
 import {
   ERROR_DELETE_FILE,
+  ERROR_GET_URLS_FILES,
   ERROR_UPDATE_OWNWER_ID_FILE,
   ERROR_UPLOAD_FILE,
 } from './fileService.constants';
@@ -69,5 +71,21 @@ export class FileServiceAdapter {
       this.logger.error(error);
       return Result.Err(new BadGatewayError(ERROR_UPDATE_OWNWER_ID_FILE));
     }
-  }users
+  }
+
+  async getFilesInfo(ids: string[]): Promise<Result<FilesUrlResponse>> {
+    try {
+      const responseOfService = this.fileServiceClient
+        .send({ cmd: 'get_files_url' }, { ids })
+        .pipe(timeout(10000));
+      const response: FilesUrlResponse = await firstValueFrom(
+        responseOfService,
+      );
+
+      return Result.Ok(response);
+    } catch (error) {
+      this.logger.log(error);
+      return Result.Err(new BadGatewayError(ERROR_GET_URLS_FILES));
+    }
+  }
 }

@@ -2,35 +2,21 @@ import { applyDecorators } from '@nestjs/common';
 import {
   ApiBadGatewayResponse,
   ApiBadRequestResponse,
-  ApiBody,
-  ApiConsumes,
   ApiCreatedResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ApiErrorResponse, BadRequestResponse } from '../../responses';
-import { FileUploadResponse } from '@libs/contracts';
 import { BAD_REQUEST } from '../swagger.constants';
+import { ResponsePostDto } from '@gateway/src/features/post/responses/responsePost.dto';
 
-export function UploadImagePostSwaggerDecorator() {
+export function CreatePostSwaggerDecorator() {
   return applyDecorators(
-    ApiConsumes('multipart/form-data'),
-    ApiBody({
-      schema: {
-        type: 'object',
-        properties: {
-          image: {
-            type: 'string',
-            format: 'binary',
-          },
-        },
-      },
-    }),
     ApiUnauthorizedResponse({ type: ApiErrorResponse }),
     ApiOperation({
-      summary: 'Upload image post',
+      summary: 'Create post',
     }),
-    ApiCreatedResponse({ type: FileUploadResponse }),
+    ApiCreatedResponse({ type: ResponsePostDto }),
     ApiBadRequestResponse({
       description: BAD_REQUEST,
       type: BadRequestResponse,

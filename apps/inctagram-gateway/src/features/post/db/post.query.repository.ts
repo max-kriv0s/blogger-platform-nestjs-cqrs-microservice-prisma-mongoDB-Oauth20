@@ -1,11 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../core/prisma/prisma.servise';
-import { NotFoundError, Result } from '../../../core';
+import { FileServiceAdapter, NotFoundError, Result } from '../../../core';
 import { ResponsePostDto } from '@gateway/src/features/post/responses/responsePost.dto';
 import { ERROR_POST_NOT_FOUND } from '@gateway/src/features/post/post.constants';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom, timeout } from 'rxjs';
-import { FilesUrlResponse } from '@libs/contracts';
 
 @Injectable()
 export class PostQueryRepository {
@@ -13,7 +10,7 @@ export class PostQueryRepository {
 
   constructor(
     private readonly prismaService: PrismaService,
-    @Inject('FILE_SERVICE') private readonly fileServiceClient: ClientProxy,
+    private readonly fileServiceAdapter: FileServiceAdapter,
   ) {}
 
   async getPostViewById(
@@ -31,18 +28,11 @@ export class PostQueryRepository {
 
     const ids = post.images.map((image) => image.imageId);
 
-    try {
-      const responseOfService = this.fileServiceClient
-        .send({ cmd: 'get_files_url' }, { ids })
-        .pipe(timeout(10000));
-      const response: FilesUrlResponse = await firstValueFrom(
-        responseOfService,
-      );
-
-      return Result.Ok(ResponsePostDto.getView(post, response.urls));
-    } catch (error) {
-      this.logger.log(`userId: ${id} - ${error}`);
+    const result = await this.fileServiceAdapter.getFilesInfo(ids);
+    if (!result.isSuccess) {
       return Result.Ok(ResponsePostDto.getView(post));
     }
+
+    return Result.Ok(ResponsePostDto.getView(post, result.value.urls));
   }
 }

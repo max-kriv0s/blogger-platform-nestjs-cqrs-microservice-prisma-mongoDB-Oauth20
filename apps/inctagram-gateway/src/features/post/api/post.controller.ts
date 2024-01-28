@@ -29,6 +29,8 @@ import { FileUploadResponse } from '@libs/contracts';
 import { UploadImagePostSwaggerDecorator } from '@gateway/src/core/swagger/post/uploadImagePost.swagger.decorator';
 import { CreatePostDto } from '../dto/createPost.dto';
 import { ResponsePostDto } from '../responses/responsePost.dto';
+import { CreatePostSwaggerDecorator } from '@gateway/src/core/swagger/post/createPost.swagger.decorator';
+import { GetPostViewSwaggerDecorator } from '@gateway/src/core/swagger/post/getPostView.swagger.decorator';
 
 @ApiTags('Post')
 @ApiBearerAuth()
@@ -83,6 +85,7 @@ export class PostController {
     return downloadResult.value;
   }
 
+  @CreatePostSwaggerDecorator()
   @Post()
   async createPost(
     @Body() createDto: CreatePostDto,
@@ -97,8 +100,12 @@ export class PostController {
     return this.getPostView(resultCreation.value.id, userId);
   }
 
+  @GetPostViewSwaggerDecorator()
   @Get(':id')
-  async getPost(@Param('id') postId: string, @CurrentUserId() userId: string) {
+  async getPost(
+    @Param('id') postId: string,
+    @CurrentUserId() userId: string,
+  ): Promise<ResponsePostDto> {
     return this.getPostView(postId, userId);
   }
 
