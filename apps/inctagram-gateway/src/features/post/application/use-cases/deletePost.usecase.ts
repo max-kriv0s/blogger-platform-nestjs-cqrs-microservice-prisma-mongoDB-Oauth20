@@ -1,12 +1,16 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostRepository } from '@gateway/src/features/post/db/post.repository';
-import { Result } from '@gateway/src/core';
+import { BadGatewayError, Result } from '@gateway/src/core';
 import { ForbiddenError, NotFoundError } from '@gateway/src/core';
 import {
   ERROR_NOT_PERMITTED,
   ERROR_POST_NOT_FOUND,
 } from '@gateway/src/features/post/post.constants';
-import { DeleteFileCommand } from '@fileService/src/files/application';
+import { PrismaService } from '@gateway/src/core/prisma/prisma.servise';
+import { firstValueFrom, timeout } from 'rxjs';
+import { Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { ERROR_DELETE_FILE } from '@gateway/src/features/user/user.constants';
 
 export class DeletePostCommand {
   constructor(
@@ -20,6 +24,8 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
   constructor(
     private readonly postRepo: PostRepository,
     private readonly commandBus: CommandBus,
+    private readonly prismaService: PrismaService,
+    @Inject('FILE_SERVICE') private readonly fileServiceClient: ClientProxy,
   ) {}
 
   async execute(command: DeletePostCommand) {
@@ -33,9 +39,25 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
       return Result.Err(new ForbiddenError(ERROR_NOT_PERMITTED));
     }
 
-    await this.commandBus.execute(new DeleteFileCommand(post.imageId));
-    await this.postRepo.delete(command.postId);
+    return this.prismaService.$transaction(async (transactionClient) => {
+      const deletePostResponse = await transactionClient.post.delete({
+        where: { id: command.postId },
+      });
 
-    return Result.Ok();
+      if (!deletePostResponse) {
+        throw new NotFoundError(ERROR_POST_NOT_FOUND);
+      }
+
+      const deleteFileResponse = this.fileServiceClient
+        .send({ cmd: 'delete_file' }, { fileId: post.imageId })
+        .pipe(timeout(10000));
+
+      const fileDeletionResult = await firstValueFrom(deleteFileResponse);
+      const isFileDeleteSuccess = fileDeletionResult.isSuccess;
+
+      if (!isFileDeleteSuccess) {
+        throw new BadGatewayError(ERROR_DELETE_FILE);
+      }
+    });
   }
 }
