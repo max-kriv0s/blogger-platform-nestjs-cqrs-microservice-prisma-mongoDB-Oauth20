@@ -8,7 +8,7 @@ import {
 } from '@gateway/src/features/post/post.constants';
 import { PrismaService } from '@gateway/src/core/prisma/prisma.servise';
 import { firstValueFrom, timeout } from 'rxjs';
-import { Inject } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { ERROR_DELETE_FILE } from '@gateway/src/features/user/user.constants';
 
@@ -21,6 +21,8 @@ export class DeletePostCommand {
 
 @CommandHandler(DeletePostCommand)
 export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
+  logger = new Logger(DeletePostUseCase.name);
+
   constructor(
     private readonly postRepo: PostRepository,
     private readonly prismaService: PrismaService,
@@ -48,15 +50,21 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
           throw new NotFoundError(ERROR_POST_NOT_FOUND);
         }
 
-        const deleteFileResponse = this.fileServiceClient
-          .send({ cmd: 'delete_file' }, { fileId: post.imageId })
-          .pipe(timeout(10000));
+        let isSuccess = false;
 
-        const fileDeletionResult = await firstValueFrom(deleteFileResponse);
-        const isFileDeleteSuccess = fileDeletionResult.isSuccess;
+        try {
+          const responseOfService = this.fileServiceClient
+            .send({ cmd: 'delete_file' }, { fileId: post.imageId })
+            .pipe(timeout(10000));
+          const deletionResult = await firstValueFrom(responseOfService);
+          isSuccess = deletionResult.isSuccess;
+        } catch (error) {
+          this.logger.error(error);
+          return Result.Err(new BadGatewayError(ERROR_DELETE_FILE));
+        }
 
-        if (!isFileDeleteSuccess) {
-          throw new BadGatewayError(ERROR_DELETE_FILE);
+        if (!isSuccess) {
+          return Result.Err(new BadGatewayError(ERROR_DELETE_FILE));
         }
 
         return deletePostResponse;

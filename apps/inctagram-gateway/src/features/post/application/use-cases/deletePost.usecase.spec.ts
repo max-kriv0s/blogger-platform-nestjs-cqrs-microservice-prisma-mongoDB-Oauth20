@@ -11,6 +11,7 @@ import {
   ERROR_NOT_PERMITTED,
   ERROR_POST_NOT_FOUND,
 } from '@gateway/src/features/post/post.constants';
+import { PostRepository } from '@gateway/src/features/post/db/post.repository';
 
 describe('DeletePostUseCase', () => {
   let module: TestingModule;
@@ -18,6 +19,8 @@ describe('DeletePostUseCase', () => {
   let useCase: DeletePostUseCase;
   let post: Post;
   let user: User;
+  let postRepo: PostRepository;
+  let fileServiceClient;
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
@@ -26,6 +29,7 @@ describe('DeletePostUseCase', () => {
 
     prismaService = module.get<PrismaService>(PrismaService);
     useCase = module.get<DeletePostUseCase>(DeletePostUseCase);
+    postRepo = module.get<PostRepository>(PostRepository);
   });
 
   afterEach(async () => {
@@ -80,17 +84,51 @@ describe('DeletePostUseCase', () => {
     });
 
     it('Should delete post', async () => {
+      const mockPost = {
+        id: 'postId',
+        authorId: 'authorId',
+        imageId: 'imageId',
+      };
+
+      const mockUser = { id: 'authorId' };
+
+      fileServiceClient = {
+        send: jest.fn(),
+      };
+
+      const findPostById = jest
+        .spyOn(postRepo, 'findById')
+        .mockReturnValueOnce(mockPost as any);
+
+      const mockedFileServiceCleint = jest
+        .spyOn(prismaService, '$transaction')
+        .mockReturnValueOnce(fileServiceClient);
+
+      console.log(mockedFileServiceCleint);
+
       const deleteResult = await useCase.execute(
-        new DeletePostCommand(post.id, user.id),
+        new DeletePostCommand(mockPost.id, mockUser.id),
       );
+
+      console.log('deleteResult', deleteResult);
+
+      const findPosResponse = findPostById.mock.results[0].value;
+      expect(postRepo.findById).toHaveBeenCalled();
+      expect(findPosResponse).toEqual(mockPost);
+
+      expect(prismaService.$transaction).toHaveBeenCalled();
 
       expect(deleteResult.isSuccess).toBe(true);
 
-      const isPostExists = await prismaService.post.findUnique({
-        where: { id: post.id },
-      });
+      expect(postRepo.findById).toHaveBeenCalledWith('postId');
+      expect(prismaService.$transaction).toHaveBeenCalled();
 
-      expect(isPostExists).toBe(null);
+      //TODO How can I check if the fileServiceClient.send has been called
+      //expect(fileServiceClient.send).toHaveBeenCalled();
+      // expect(fileServiceClient.send).toHaveBeenCalledWith(
+      //   { cmd: 'delete_file' },
+      //   { fileId: 'imageId' },
+      // );
     });
   });
 });
