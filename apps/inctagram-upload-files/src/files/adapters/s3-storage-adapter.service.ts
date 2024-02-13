@@ -7,6 +7,7 @@ import {
 import { FileUploadRequest } from '@libs/contracts';
 import { YandexCloudBacketConfig } from '../config/yandex-cloud-backet.configuration';
 import { FileSaveResponse } from '../types/fileSave.response';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class S3StorageAdapter {
@@ -33,11 +34,11 @@ export class S3StorageAdapter {
 
   async saveAvatar({
     userId,
-    originalname,
     buffer,
     format,
+    fileType,
   }: FileUploadRequest): Promise<FileSaveResponse> {
-    const key = `content/users/${userId}/avatars/${originalname}`;
+    const key = `content/${userId}/${fileType}/${uuidv4()}.${format}`;
     const bucketParams = {
       Bucket: this.bucketName,
       Key: key,
