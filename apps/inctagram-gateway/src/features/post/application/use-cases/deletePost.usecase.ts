@@ -72,7 +72,7 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
     );
 
     if (!deleteResult) {
-      return Result.Err(new NotFoundError('temporary for check'));
+      return Result.Err(new NotFoundError('temporary for check')); //TODO: What to return
     }
 
     return Result.Ok();
