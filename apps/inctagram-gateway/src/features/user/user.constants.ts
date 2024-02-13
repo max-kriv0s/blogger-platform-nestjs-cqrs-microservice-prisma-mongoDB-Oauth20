@@ -47,7 +47,4 @@ export const ERROR_LENGTH_ABOUT_ME = `
 export const ERROR_LESS_THAN_13_YEARS_OLD = `A user under 13 cannot create a profile`;
 
 export const ERROR_INVALID_FILE_TYPE = 'Invalid file type';
-
-export const ERROR_UPLOAD_FILE = 'File not loaded';
-export const ERROR_DELETE_FILE = 'The file was not deleted';
 export const ERROR_FILE_NOT_FOUND = 'File not found';

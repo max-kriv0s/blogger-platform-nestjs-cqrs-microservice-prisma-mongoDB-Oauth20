@@ -1,11 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-
 import { UserRepository } from '../../db';
-import { ERROR_DELETE_FILE, USER_NOT_FOUND } from '../../user.constants';
-import { firstValueFrom, timeout } from 'rxjs';
-import { Inject, Logger } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { BadGatewayError, NotFoundError, Result } from '@gateway/src/core';
+import { USER_NOT_FOUND } from '../../user.constants';
+import { FileServiceAdapter, NotFoundError, Result } from '@gateway/src/core';
+import { Logger } from '@nestjs/common';
 
 export class DeleteAvatarUserCommand {
   constructor(public userId: string) {}
@@ -19,7 +16,7 @@ export class DeleteAvatarUserUseCase
 
   constructor(
     private readonly userRepo: UserRepository,
-    @Inject('FILE_SERVICE') private readonly fileServiceClient: ClientProxy,
+    private readonly fileServiceAdapter: FileServiceAdapter,
   ) {}
 
   async execute({ userId }: DeleteAvatarUserCommand): Promise<Result> {
@@ -27,26 +24,13 @@ export class DeleteAvatarUserUseCase
     if (!user) {
       return Result.Err(new NotFoundError(USER_NOT_FOUND));
     }
-
     if (!user.avatarId) {
       return Result.Ok();
     }
 
-    let isSuccess = false;
-
-    try {
-      const responseOfService = this.fileServiceClient
-        .send({ cmd: 'delete_file' }, { fileId: user.avatarId })
-        .pipe(timeout(10000));
-      const deletionResult = await firstValueFrom(responseOfService);
-      isSuccess = deletionResult.isSuccess;
-    } catch (error) {
-      this.logger.error(error);
-      return Result.Err(new BadGatewayError(ERROR_DELETE_FILE));
-    }
-
-    if (!isSuccess) {
-      return Result.Err(new BadGatewayError(ERROR_DELETE_FILE));
+    const deletionResult = await this.fileServiceAdapter.delete(user.avatarId);
+    if (!deletionResult.isSuccess) {
+      return Result.Err(deletionResult.err);
     }
 
     await this.userRepo.update(user.id, { avatarId: null });

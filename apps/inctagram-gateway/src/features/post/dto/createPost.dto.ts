@@ -1,8 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Length, IsString, IsNotEmpty, Matches } from 'class-validator';
-import { ERROR_LENGTH_DESCRIPTION } from '@gateway/src/features/post/post.constants';
+import {
+  Matches,
+  Length,
+  IsString,
+  IsNotEmpty,
+  IsArray,
+  ArrayNotEmpty,
+} from 'class-validator';
+import { ERROR_LENGTH_DESCRIPTION } from '../post.constants';
 
-export class UpdatePostDto {
+export class CreatePostDto {
+  @IsString({ each: true })
+  @ArrayNotEmpty()
+  @IsArray()
+  images: string[];
+
   @ApiProperty({
     description: 'Post description',
     type: 'string',

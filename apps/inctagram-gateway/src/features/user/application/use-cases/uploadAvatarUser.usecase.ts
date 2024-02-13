@@ -1,20 +1,13 @@
-import { FileUploadRequest, FileUploadResponse } from '@libs/contracts';
-import { Inject, Logger } from '@nestjs/common';
+import { FileUploadRequest } from '@libs/contracts';
+import { Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ClientProxy } from '@nestjs/microservices';
 import { UserRepository } from '../../db';
 import { ImageInputDto } from '../../dto';
-import {
-  ERROR_INVALID_FILE_TYPE,
-  ERROR_UPLOAD_FILE,
-  USER_NOT_FOUND,
-} from '../../user.constants';
+import { ERROR_INVALID_FILE_TYPE, USER_NOT_FOUND } from '../../user.constants';
 import sharp from 'sharp';
-
-import { firstValueFrom, timeout } from 'rxjs';
 import {
-  BadGatewayError,
   BadRequestError,
+  FileServiceAdapter,
   NotFoundError,
   Result,
 } from '@gateway/src/core';
@@ -31,7 +24,7 @@ export class UploadAvatarUserUseCase
   logger = new Logger(UploadAvatarUserUseCase.name);
 
   constructor(
-    @Inject('FILE_SERVICE') private readonly fileServiceClient: ClientProxy,
+    private readonly fileServiceAdapter: FileServiceAdapter,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -42,36 +35,15 @@ export class UploadAvatarUserUseCase
       return Result.Err(resultValidate.err);
     }
 
-    const payload: FileUploadRequest = {
-      userId: data.userId,
-      originalname: data.originalname,
-      buffer: data.buffer,
-      format: metadata.format,
-      fileType: FileType.Avatar,
-      ownerId: data.userId,
-    };
-    // TODO - вынести в адаптер для файлового сервиса
-    let fileId: string;
-    try {
-      const responseOfService = this.fileServiceClient
-        .send({ cmd: 'upload_file' }, payload)
-        .pipe(timeout(10000));
+    const payload = this.getPayload(data, metadata);
 
-      const resultResponse: FileUploadResponse = await firstValueFrom(
-        responseOfService,
-      );
-      fileId = resultResponse.fileId;
-    } catch (error) {
-      this.logger.error(error);
-      return Result.Err(new BadGatewayError(ERROR_UPLOAD_FILE));
-    }
-
-    if (!fileId) {
-      return Result.Err(new BadGatewayError(ERROR_UPLOAD_FILE));
+    const downloadResult = await this.fileServiceAdapter.upload(payload);
+    if (!downloadResult.isSuccess) {
+      return Result.Err(downloadResult.err);
     }
 
     const updateResult = await this.userRepository
-      .update(data.userId, { avatarId: fileId })
+      .update(data.userId, { avatarId: downloadResult.value.fileId })
       .catch((err) => {
         this.logger.error(err);
         return null;
@@ -89,5 +61,19 @@ export class UploadAvatarUserUseCase
       return Result.Err(new BadRequestError(ERROR_INVALID_FILE_TYPE, 'file'));
     }
     return Result.Ok();
+  }
+
+  private getPayload(
+    data: ImageInputDto,
+    metadata: sharp.Metadata,
+  ): FileUploadRequest {
+    return {
+      userId: data.userId,
+      originalname: data.originalname,
+      buffer: data.buffer,
+      format: metadata.format,
+      fileType: FileType.Avatar,
+      ownerId: data.userId,
+    };
   }
 }
