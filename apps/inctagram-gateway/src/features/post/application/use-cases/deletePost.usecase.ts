@@ -1,16 +1,17 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostRepository } from '@gateway/src/features/post/db/post.repository';
-import { BadGatewayError, Result } from '@gateway/src/core';
+import { BadGatewayError, FileServiceAdapter, Result } from '@gateway/src/core';
 import { ForbiddenError, NotFoundError } from '@gateway/src/core';
 import {
+  ERROR_DELETE_POST,
   ERROR_NOT_PERMITTED,
   ERROR_POST_NOT_FOUND,
 } from '@gateway/src/features/post/post.constants';
 import { PrismaService } from '@gateway/src/core/prisma/prisma.servise';
-import { firstValueFrom, timeout } from 'rxjs';
-import { Inject, Logger } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { ERROR_DELETE_FILE } from '@gateway/src/features/user/user.constants';
+import { Logger } from '@nestjs/common';
+import { ERROR_DELETE_FILE } from '@gateway/src/core/adapters/fileService/fileService.constants';
+import { PostImageRepository } from '@gateway/src/features/post/db/postImage.repository';
+import { Post, PostImage } from '@prisma/client';
 
 export class DeletePostCommand {
   constructor(
@@ -25,12 +26,13 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
 
   constructor(
     private readonly postRepo: PostRepository,
+    private readonly postImageRepo: PostImageRepository,
     private readonly prismaService: PrismaService,
-    @Inject('FILE_SERVICE') private readonly fileServiceClient: ClientProxy,
+    private readonly fileServiceAdapter: FileServiceAdapter,
   ) {}
 
   async execute(command: DeletePostCommand) {
-    const post = await this.postRepo.findById(command.postId);
+    const post: Post = await this.postRepo.findById(command.postId);
 
     if (!post) {
       return Result.Err(new NotFoundError(ERROR_POST_NOT_FOUND));
@@ -39,6 +41,14 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
     if (command.userId !== post.authorId) {
       return Result.Err(new ForbiddenError(ERROR_NOT_PERMITTED));
     }
+
+    const postImages: PostImage[] = await this.postImageRepo.findByPostId(
+      post.id,
+    );
+
+    const postImageIds = postImages.map((postImage) => {
+      return postImage.imageId;
+    });
 
     const deleteResult = await this.prismaService.$transaction(
       async (transactionClient) => {
@@ -50,21 +60,12 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
           throw new NotFoundError(ERROR_POST_NOT_FOUND);
         }
 
-        let isSuccess = false;
+        const isPostImagesDeleted = await this.fileServiceAdapter.deleteFiles(
+          postImageIds,
+        );
 
-        try {
-          const responseOfService = this.fileServiceClient
-            .send({ cmd: 'delete_file' }, { fileId: post.imageId })
-            .pipe(timeout(10000));
-          const deletionResult = await firstValueFrom(responseOfService);
-          isSuccess = deletionResult.isSuccess;
-        } catch (error) {
-          this.logger.error(error);
-          return Result.Err(new BadGatewayError(ERROR_DELETE_FILE));
-        }
-
-        if (!isSuccess) {
-          return Result.Err(new BadGatewayError(ERROR_DELETE_FILE));
+        if (!isPostImagesDeleted.isSuccess) {
+          throw new BadGatewayError(ERROR_DELETE_FILE);
         }
 
         return deletePostResponse;
@@ -72,7 +73,7 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
     );
 
     if (!deleteResult) {
-      return Result.Err(new NotFoundError('temporary for check')); //TODO: What to return
+      return Result.Err(new BadGatewayError(ERROR_DELETE_POST));
     }
 
     return Result.Ok();

@@ -37,6 +37,16 @@ import { GetPostViewSwaggerDecorator } from '@gateway/src/core/swagger/post/getP
 import { DeletePostCommand } from '@gateway/src/features/post/application/use-cases/deletePost.usecase';
 import { DeletePostSwaggerDecorator } from '@gateway/src/core/swagger/post/deletePost.swagger.decorator';
 
+const baseUrl = '/post';
+
+export const endpoints = {
+  updatePost: () => `${baseUrl}/:id`,
+  uploadImagePost: () => `${baseUrl}/image`,
+  createPost: () => `${baseUrl}`,
+  getPost: () => `${baseUrl}/:id`,
+  deletePost: () => `${baseUrl}/:id`,
+};
+
 @ApiTags('Post')
 @ApiBearerAuth()
 @UseGuards(AccessTokenGuard)
