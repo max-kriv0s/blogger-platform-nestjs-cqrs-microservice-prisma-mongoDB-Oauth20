@@ -15,6 +15,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { MessagePattern } from '@nestjs/microservices';
 import { DeleteFileCommand, UploadFileCommand } from './application';
 import { FilesService } from './files.service';
+import { DeleteFilesCommand } from '@fileService/src/files/application/use-cases/deleteFiles.usecase';
+import { FilesDeleteRequest } from '@libs/contracts/user/avatar/filesDeleteRequest.dto';
 
 @Controller('files')
 export class FilesController {
@@ -34,6 +36,15 @@ export class FilesController {
   async deleteFile({ fileId }: FileDeleteRequest): Promise<FileDeleteResponse> {
     return this.commandBus.execute<DeleteFileCommand, FileDeleteResponse>(
       new DeleteFileCommand(fileId),
+    );
+  }
+
+  @MessagePattern({ cmd: 'delete_files' })
+  async deleteFiles({
+    fileIds,
+  }: FilesDeleteRequest): Promise<FileDeleteResponse> {
+    return this.commandBus.execute<DeleteFilesCommand, FileDeleteResponse>(
+      new DeleteFilesCommand(fileIds),
     );
   }
 

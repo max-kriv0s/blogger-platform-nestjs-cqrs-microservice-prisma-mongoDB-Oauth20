@@ -54,6 +54,18 @@ export class FileServiceAdapter {
       return Result.Err(new BadGatewayError(ERROR_DELETE_FILE));
     }
   }
+  async deleteFiles(fileIds: string[]): Promise<Result<FileDeleteResponse>> {
+    try {
+      const responseOfService = this.fileServiceClient
+        .send({ cmd: 'delete_files' }, { fileIds })
+        .pipe(timeout(10000));
+      const deletionResult = await firstValueFrom(responseOfService);
+      return Result.Ok<FileDeleteResponse>(deletionResult);
+    } catch (error) {
+      this.logger.error(error);
+      return Result.Err(new BadGatewayError(ERROR_DELETE_FILE));
+    }
+  }
 
   async updateOwnerId(ids: string[], ownerId: string): Promise<Result> {
     try {
