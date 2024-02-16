@@ -5,6 +5,7 @@ import { ForbiddenError, NotFoundError } from '@gateway/src/core';
 import {
   ERROR_DELETE_POST,
   ERROR_NOT_PERMITTED,
+  ERROR_POST_IMAGE_NOT_FOUND,
   ERROR_POST_NOT_FOUND,
 } from '@gateway/src/features/post/post.constants';
 import { PrismaService } from '@gateway/src/core/prisma/prisma.servise';
@@ -52,6 +53,15 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
 
     const deleteResult = await this.prismaService.$transaction(
       async (transactionClient) => {
+        const deletePostImageResponse =
+          await transactionClient.postImage.deleteMany({
+            where: { imageId: { in: postImageIds } },
+          });
+
+        if (deletePostImageResponse.count !== postImageIds.length) {
+          throw new NotFoundError(ERROR_POST_IMAGE_NOT_FOUND);
+        }
+
         const deletePostResponse = await transactionClient.post.delete({
           where: { id: command.postId },
         });

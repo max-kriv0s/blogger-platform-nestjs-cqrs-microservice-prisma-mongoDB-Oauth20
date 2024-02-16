@@ -44,7 +44,7 @@ export const endpoints = {
   uploadImagePost: () => `${baseUrl}/image`,
   createPost: () => `${baseUrl}`,
   getPost: () => `${baseUrl}/:id`,
-  deletePost: () => `${baseUrl}/:id`,
+  deletePost: (id: string) => `${baseUrl}/${id}`,
 };
 
 @ApiTags('Post')
