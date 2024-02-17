@@ -8,6 +8,9 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Delete,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UpdatePostDto } from '@gateway/src/features/post/dto/updatePost.dto';
@@ -31,6 +34,18 @@ import { CreatePostDto } from '../dto/createPost.dto';
 import { ResponsePostDto } from '../responses/responsePost.dto';
 import { CreatePostSwaggerDecorator } from '@gateway/src/core/swagger/post/createPost.swagger.decorator';
 import { GetPostViewSwaggerDecorator } from '@gateway/src/core/swagger/post/getPostView.swagger.decorator';
+import { DeletePostCommand } from '@gateway/src/features/post/application/use-cases/deletePost.usecase';
+import { DeletePostSwaggerDecorator } from '@gateway/src/core/swagger/post/deletePost.swagger.decorator';
+
+const baseUrl = '/post';
+
+export const endpoints = {
+  updatePost: () => `${baseUrl}/:id`,
+  uploadImagePost: () => `${baseUrl}/image`,
+  createPost: () => `${baseUrl}`,
+  getPost: () => `${baseUrl}/:id`,
+  deletePost: (id: string) => `${baseUrl}/${id}`,
+};
 
 @ApiTags('Post')
 @ApiBearerAuth()
@@ -123,5 +138,22 @@ export class PostController {
       throw postViewResult.err;
     }
     return postViewResult.value;
+  }
+
+  @DeletePostSwaggerDecorator()
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePost(
+    @Param('id') postId: string,
+    @CurrentUserId() userId: string,
+  ) {
+    const deleteResult = await this.commandBus.execute<
+      DeletePostCommand,
+      Result
+    >(new DeletePostCommand(postId, userId));
+
+    if (!deleteResult.isSuccess) throw deleteResult.err;
+
+    return deleteResult;
   }
 }

@@ -34,4 +34,10 @@ export class PostRepository {
       },
     });
   }
+
+  async delete(id: string) {
+    return this.prismaService.post.delete({
+      where: { id },
+    });
+  }
 }

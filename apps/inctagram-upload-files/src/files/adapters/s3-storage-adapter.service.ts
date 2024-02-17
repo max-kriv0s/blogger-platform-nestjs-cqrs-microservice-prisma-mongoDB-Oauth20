@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
@@ -74,6 +75,21 @@ export class S3StorageAdapter {
     }
   }
 
+  async deleteImages(keys: string[]) {
+    const objectsToDelete = keys.map((key) => ({ Key: key }));
+
+    const bucketParams = {
+      Bucket: this.bucketName,
+      Delete: { Objects: objectsToDelete },
+      Quiet: false,
+    };
+    try {
+      return await this.s3Client.send(new DeleteObjectsCommand(bucketParams));
+    } catch (exception) {
+      this.logger.error(exception);
+      throw exception;
+    }
+  }
   getUrlFile(url: string) {
     return `${this.settings.YANDEX_CLOUD_URL_FILES}/${url}`;
   }
