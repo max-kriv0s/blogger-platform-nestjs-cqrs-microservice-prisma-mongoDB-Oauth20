@@ -3,13 +3,13 @@ pipeline {
     agent any
     environment {
         ENV_TYPE = "production"
-        PORT = 3196
+        PORT = 3260
         NAMESPACE = "ft-inctagram-site"
         REGISTRY_HOSTNAME = "vladnen97"
-        PROJECT = "inctagram-upload-files"
+        PROJECT = "ft-inctagram-upload-files"
         SERVICE="inctagram-upload-files"
         REGISTRY = "registry.hub.docker.com"
-        DEPLOYMENT_NAME = "inctagram-upload-files-deployment"
+        DEPLOYMENT_NAME = "ft-inctagram-upload-files-deployment"
         IMAGE_NAME = "${env.BUILD_ID}_${env.ENV_TYPE}_${env.GIT_COMMIT}"
         DOCKER_BUILD_NAME = "${env.REGISTRY_HOSTNAME}/${env.PROJECT}:${env.IMAGE_NAME}"
     }
@@ -31,7 +31,7 @@ pipeline {
         stage('e2e tests') {
             steps {
                 script {
-                    sh "yarn test:e2e:inctagram-upload-files"
+                    sh "yarn test:e2e"
                 }
             }
         }
