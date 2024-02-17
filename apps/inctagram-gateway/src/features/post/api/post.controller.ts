@@ -94,6 +94,7 @@ export class PostController {
     const resultCreation = await this.commandBus.execute<CreatePostCommand>(
       new CreatePostCommand(createDto, userId),
     );
+
     if (!resultCreation.isSuccess) {
       throw resultCreation.err;
     }
