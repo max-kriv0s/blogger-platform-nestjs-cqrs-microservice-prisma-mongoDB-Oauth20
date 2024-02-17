@@ -9,6 +9,7 @@ import {
   getClientFileServiceConfig,
 } from '@gateway/src/core';
 import { ClientsModule } from '@nestjs/microservices';
+import { PostImageRepository } from '@gateway/src/features/post/db/postImage.repository';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ClientsModule } from '@nestjs/microservices';
   controllers: [PostController],
   providers: [
     PostRepository,
+    PostImageRepository,
     ...POST_USE_CASE,
     PostQueryRepository,
     FileServiceAdapter,
