@@ -24,9 +24,9 @@ export class DeleteFilesUseCases
       return result;
     }
 
-    const urls = files.map((file) =>
-      this.fileStorageAdapter.getUrlFile(file.url),
-    );
+    const urls = files.map((file) => {
+      return file.url;
+    });
 
     //TODO: Need transaction here. How to make s3 api transaction
     await this.fileStorageAdapter.deleteImages(urls);

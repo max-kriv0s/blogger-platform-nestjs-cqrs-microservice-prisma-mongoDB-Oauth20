@@ -107,6 +107,8 @@ describe('PostController (e2e) test', () => {
       accesTokenSecondUser = tokenPairs.body.accessToken;
     });
 
+    it(`${endpoints.createPost()} (POST) Should upload images for post`, async () => {});
+
     it(`${endpoints.createPost()} (POST) Should create post with images`, async () => {
       jest
         .spyOn(fileServiceAdapter, 'updateOwnerId')
