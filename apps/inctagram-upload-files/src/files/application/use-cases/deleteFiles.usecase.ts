@@ -8,9 +8,7 @@ export class DeleteFilesCommand {
 }
 
 @CommandHandler(DeleteFilesCommand)
-export class DeleteFilesUseCases
-  implements ICommandHandler<DeleteFilesCommand>
-{
+export class DeleteFilesUseCase implements ICommandHandler<DeleteFilesCommand> {
   constructor(
     private readonly fileStorageAdapter: S3StorageAdapter,
     private readonly fileRepo: FileRepository,
@@ -19,14 +17,14 @@ export class DeleteFilesUseCases
   async execute({ fileIds }: DeleteFilesCommand): Promise<FileDeleteResponse> {
     const result = { isSuccess: true };
     const files = await this.fileRepo.findFilesByIds(fileIds);
-    if (!files.length) {
+    if (!files || !files.length) {
       result.isSuccess = false;
       return result;
     }
 
-    const urls = files.map((file) =>
-      this.fileStorageAdapter.getUrlFile(file.url),
-    );
+    const urls = files.map((file) => {
+      return file.url;
+    });
 
     //TODO: Need transaction here. How to make s3 api transaction
     await this.fileStorageAdapter.deleteImages(urls);

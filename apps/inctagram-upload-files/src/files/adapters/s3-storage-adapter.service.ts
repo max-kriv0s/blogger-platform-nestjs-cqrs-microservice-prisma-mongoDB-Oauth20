@@ -6,7 +6,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { FileUploadRequest } from '@libs/contracts';
-import { YandexCloudBacketConfig } from '../config/yandex-cloud-backet.configuration';
+import { AmazonCloudBacketConfig } from '../config/yandex-cloud-backet.configuration';
 import { FileSaveResponse } from '../types/fileSave.response';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,17 +18,17 @@ export class S3StorageAdapter {
   private bucketName: string;
   private settings;
 
-  constructor(private readonly yandexCloudConfig: YandexCloudBacketConfig) {
+  constructor(private readonly yandexCloudConfig: AmazonCloudBacketConfig) {
     this.settings = yandexCloudConfig.getSettings();
-    this.bucketName = this.settings.YANDEX_CLOUD_BUCKET_NAME;
+    this.bucketName = this.settings.AMAZON_CLOUD_BUCKET_NAME;
 
-    const REGION = 'ru-central1';
+    const REGION = 'eu-north-1';
     this.s3Client = new S3Client({
       region: REGION,
-      endpoint: this.settings.YANDEX_CLOUD_URL,
+      endpoint: this.settings.AMAZON_CLOUD_URL,
       credentials: {
-        secretAccessKey: this.settings.YANDEX_CLOUD_SECRET_KEY,
-        accessKeyId: this.settings.YANDEX_CLOUD_KEY_ID,
+        secretAccessKey: this.settings.AMAZON_CLOUD_SECRET_KEY,
+        accessKeyId: this.settings.AMAZON_CLOUD_KEY_ID,
       },
     });
   }
@@ -48,10 +48,8 @@ export class S3StorageAdapter {
     };
 
     const command = new PutObjectCommand(bucketParams);
-
     try {
       const uploadResult = await this.s3Client.send(command);
-
       return {
         url: key,
         fileId: uploadResult.ETag,
@@ -91,6 +89,6 @@ export class S3StorageAdapter {
     }
   }
   getUrlFile(url: string) {
-    return `${this.settings.YANDEX_CLOUD_URL_FILES}/${url}`;
+    return `${this.settings.AMAZON_CLOUD_URL_FILES}/${url}`;
   }
 }
