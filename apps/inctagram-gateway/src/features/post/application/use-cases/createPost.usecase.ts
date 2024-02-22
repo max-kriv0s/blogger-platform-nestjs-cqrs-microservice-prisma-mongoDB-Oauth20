@@ -27,7 +27,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
   }: CreatePostCommand): Promise<Result<Post>> {
     //TODO - тут нужна транзакция
 
-    const createResult = await this.prismaService.$transaction(
+    const createdPost = await this.prismaService.$transaction(
       async (transactionClient) => {
         const images = createDto.images.map((image) => ({
           imageId: image,
@@ -56,6 +56,6 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
         return post;
       },
     );
-    return Result.Ok(createResult);
+    return Result.Ok(createdPost);
   }
 }
